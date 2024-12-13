@@ -47,10 +47,10 @@ def copy_folders_content(source_folders, destination_folder):
 # Creamos el folder con todas las imágenes del conjunto de datos, así como otro para sus respectivas máscaras:
 
 # Juntamos las todas las imágenes.
-copy_folders_content(["/content/wound-segmentation/data/Foot Ulcer Segmentation Challenge/train/images",             # # Carpetas fuente
-                      "/content/wound-segmentation/data/Foot Ulcer Segmentation Challenge/validation/images"],       #
-                      "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/Images_MICCAI")  # Folder de destino
+copy_folders_content(["C:/Users/am969/Documents/HReps_DFU/wound-segmentation/data/Foot Ulcer Segmentation Challenge/train/images",             # # Carpetas fuente
+                      "C:/Users/am969/Documents/HReps_DFU/wound-segmentation/data/Foot Ulcer Segmentation Challenge/validation/images"],       #
+                      "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/images")  # Folder de destino
 # Juntamos las todas las máscaras.
-copy_folders_content(["/content/wound-segmentation/data/Foot Ulcer Segmentation Challenge/train/labels", 
-                      "/content/wound-segmentation/data/Foot Ulcer Segmentation Challenge/validation/labels"], 
-                      "/content/FootSegmentation_4/images-unet/Ims_double/Mascaras")
+copy_folders_content(["C:/Users/am969/Documents/HReps_DFU/wound-segmentation/data/Foot Ulcer Segmentation Challenge/train/labels", 
+                      "C:/Users/am969/Documents/HReps_DFU/wound-segmentation/data/Foot Ulcer Segmentation Challenge/validation/labels"], 
+                      "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/masks")  # Folder de destino
