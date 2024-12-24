@@ -1,3 +1,6 @@
+""" Crea las carpetas images y masks necesarias para la posterior división de 
+los datos en train, validation y test con div_data.py ."""
+
 import pandas as pd
 import io
 import os

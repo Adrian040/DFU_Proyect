@@ -1,15 +1,12 @@
+""""Divide los datos en conjuntos de entrenamiento, validación y prueba a partir de las carpetas images y masks."""
+
 import pandas as pd
-import io
-import os
 from PIL import Image
 import shutil
-
-
-
-import os
 import numpy as np
-from PIL import Image
-import shutil
+import os
+import io
+
 
 # Definir rutas
 data_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI" # Dirección de la carpeta Ims_double.
