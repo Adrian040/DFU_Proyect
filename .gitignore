@@ -1,2 +1,9 @@
 SegmentationNetworks/Models/Carvana_Unet_no_data/Unet_Pytorch/my_checkpoint.pth.tar
 SegmentationNetworks/trained_Models/Models_Zps_Imgs/
+gpu_pytorch_prove.py
+SegmentationNetworks/Models/Unet/best_model_checkpoint.pth
+SegmentationNetworks/Models/Unet/saved_images
+SegmentationNetworks/Models/Unet/metrics.csv
+SegmentationNetworks/Models/Unet/model2_weights.pth
+SegmentationNetworks/Models/Unet/model2.zip
+SegmentationNetworks/Models/Unet/predicted_mask2.png
