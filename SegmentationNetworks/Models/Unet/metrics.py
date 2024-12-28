@@ -73,7 +73,7 @@ def calculate_metrics(test_image_dir, test_mask_dir, model, device=torch.device(
 
     model.train() # regresarlo a su estado original si se quiere seguir entrenando el modelo.
 
-    return accuracy, dice_coefficient, precision, recall, f1_score
+    return accuracy.item(), dice_coefficient.item(), precision.item(), recall.item(), f1_score.item()
 
 def dice_loss(input, target):
     smooth = 1.0
