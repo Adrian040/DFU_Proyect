@@ -11,13 +11,14 @@ test_image_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data
 test_mask_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/test_masks"
 
 # ----- Cargamos el modelo entrenado con las mejores métricas ----------
-checkpoint = torch.load("output_assets_model/best_model_checkpoint.pth")
+checkpoint = torch.load("output_assets_model/best_model_checkpoint.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
 model = UNET(in_channels=3, out_channels=1).to(DEVICE)
 model.load_state_dict(checkpoint["state_dict"])
 model.eval()
 
 # ----- Calculamos las métricas --------------
 
+print("Calculating test metrics...")
 accuracy, dice_coefficient, precision, recall, f1_score = calculate_metrics(test_image_dir, test_mask_dir, model, device=DEVICE, image_height=240, image_width=240)
 
 # ----- Guardamos las métricas en un archivo .csv --------------
@@ -33,6 +34,7 @@ pd.DataFrame(test_metrics, index=[0]).to_csv("output_assets_model/test_metrics.c
 #     json.dump(test_metrics, outfile)
 
 # ----- Imprimimos las métricas (opcional) --------------
+print("Métricas calculadas:")
 print(f"Accuracy: {accuracy:.4f}")
 print(f"Dice Coefficient: {dice_coefficient:.4f}")
 print(f"Precision: {precision:.4f}")
