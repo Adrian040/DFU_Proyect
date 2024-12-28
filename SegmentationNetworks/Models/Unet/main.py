@@ -43,7 +43,7 @@ class UNET(nn.Module):
             )
             self.ups.append(DoubleConv(feature*2, feature))
 
-        self.bottlenech = DoubleConv(features[-1], features[-1]*2) # Medium part
+        self.bottleneck = DoubleConv(features[-1], features[-1]*2) # Medium part
         self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1) #Final part
 
 
@@ -54,7 +54,7 @@ class UNET(nn.Module):
             skip_connections.append(x)
             x = self.pool(x)
 
-        x = self.bottlenech(x)
+        x = self.bottleneck(x)
         skip_connections = skip_connections[::-1]
 
         for idx in range(0, len(self.ups), 2):
