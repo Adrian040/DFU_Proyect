@@ -25,6 +25,7 @@ IMAGE_WIDTH = 240
 PIN_MEMORY = True
 LOAD_MODEL = False    # True if you want to load a pre-trained model
 SAVE_IMS = True
+SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_masks"
@@ -44,7 +45,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler):
         targets = targets.float().unsqueeze(1).to(device=DEVICE)
 
         # forward:
-        with torch.cuda.amp.autocast():
+        with torch.amp.autocast('cuda'):
             predictions = model(data)
             loss = loss_fn(predictions, targets)
 
@@ -114,7 +115,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     if LOAD_MODEL:
         load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
 
-    scaler = torch.cuda.amp.GradScaler()
+    scaler = torch.amp.GradScaler('cuda')
     L_dice = []
     L_loss = []
     L_accuracy = []
@@ -138,55 +139,56 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         L_recall.append(rec)
         L_f1_score.append(f1_s)
 
-        # Save best model, based in dice score:
-        if dc > best_dice_score:
-          best_dice_score = dc
-          checkpoint = {
-              "state_dict": model.state_dict(),
-              "optimizer": optimizer.state_dict(),
-          }
-          # torch.save(checkpoint, f"model_checkpoint_epoch_{epoch+1}.pth")
+        if SAVE_MODEL:
+            # Save best model, based in dice score:
+            if dc > best_dice_score:
+                best_dice_score = dc
+                checkpoint = {
+                    "state_dict": model.state_dict(),
+                    "optimizer": optimizer.state_dict(),
+                }
+                # torch.save(checkpoint, f"model_checkpoint_epoch_{epoch+1}.pth")
 
+                # Guardar el modelo en .pth y en .zip:
+                torch.save(checkpoint, "output_assets_model/best_model_checkpoint.pth")
+                # torch.save(checkpoint, "my_checkpoint.pth.tar")
+                with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
+                    zipf.write("output_assets_model/best_model_checkpoint.pth")
 
-          # Guardar el modelo en .pth y en .zip:
-          torch.save(checkpoint, "output_assets_model/best_model_checkpoint.pth")
-          # torch.save(checkpoint, "my_checkpoint.pth.tar")
-          with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
-            zipf.write("output_assets_model/best_model_checkpoint.pth")
+            # Save some example predictions to a folder
+            if SAVE_IMS:
+                save_predictions_as_imgs( val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
+        end_time = time.time()
 
-        # Save some example predictions to a folder
-        if SAVE_IMS:
-            save_predictions_as_imgs( val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
-    end_time = time.time()
+    if SAVE_MODEL:
+        print("Saving metrics...")
+        # Save metrics for each epoch:
+            # Convert L_dice and L_accuracy to NumPy arrays:
+        L_dice = [x.cpu().numpy() for x in L_dice]
+        L_accuracy = [x.cpu().numpy() for x in L_accuracy]
+        L_precision = [x.cpu().numpy() for x in L_precision]
+        L_recall = [x.cpu().numpy() for x in L_recall]
+        L_f1_score = [x.cpu().numpy() for x in L_f1_score]
+            # Crear un DataFrame con las listas y las épocas
+        data = {'Epoch': range(1, len(L_dice) + 1), 'Dice Score': L_dice, 'Loss': L_loss, 'Accuracy': L_accuracy, 'Precision': L_precision, 'Recall': L_recall, 'F1 Score': L_f1_score}
+        df = pd.DataFrame(data)
+        df.to_csv('output_assets_model/metrics.csv', index=False)     # Guardar el DataFrame en un archivo CSV
 
-    print("Saving metrics...")
-    # Save metrics for each epoch:
-        # Convert L_dice and L_accuracy to NumPy arrays:
-    L_dice = [x.cpu().numpy() for x in L_dice]
-    L_accuracy = [x.cpu().numpy() for x in L_accuracy]
-    L_precision = [x.cpu().numpy() for x in L_precision]
-    L_recall = [x.cpu().numpy() for x in L_recall]
-    L_f1_score = [x.cpu().numpy() for x in L_f1_score]
-        # Crear un DataFrame con las listas y las épocas
-    data = {'Epoch': range(1, len(L_dice) + 1), 'Dice Score': L_dice, 'Loss': L_loss, 'Accuracy': L_accuracy, 'Precision': L_precision, 'Recall': L_recall, 'F1 Score': L_f1_score}
-    df = pd.DataFrame(data)
-    df.to_csv('output_assets_model/metrics.csv', index=False)     # Guardar el DataFrame en un archivo CSV
+        # Plot Dice and Loss:
+        plot_dice_loss(L_dice, L_loss, show_plot=False)
 
-    # Plot Dice and Loss:
-    plot_dice_loss(L_dice, L_loss, show_plot=False)
+        # Save best val metrics during training in a csv file:
+        best_metrics = {'Best Dice Score': max(L_dice), 'Best Accuracy': max(L_accuracy), 'Best Precision': max(L_precision), 'Best Recall': max(L_recall), 'Best F1 Score': max(L_f1_score)}
+        pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training).csv', index=False)
 
-    # Save best val metrics during training in a csv file:
-    best_metrics = {'Best Dice Score': max(L_dice), 'Best Accuracy': max(L_accuracy), 'Best Precision': max(L_precision), 'Best Recall': max(L_recall), 'Best F1 Score': max(L_f1_score)}
-    pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training).csv', index=False)
+        # Save parameters:
+        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[s]': round(end_time - start_time, 4)}
+        pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters.csv', index=False)    # Guardar los parámetros en un archivo CSV
+            # Guardar los parámetros como un archivo .json:
+        with open('output_assets_model/parameters.json', 'w') as json_file:
+            json.dump(parameters, json_file, indent=4)
 
-    # Save parameters:
-    parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[s]': round(end_time - start_time, 4)}
-    pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters.csv', index=False)    # Guardar los parámetros en un archivo CSV
-        # Guardar los parámetros como un archivo .json:
-    with open('output_assets_model/parameters.json', 'w') as json_file:
-        json.dump(parameters, json_file, indent=4)
-
-    print("Metrics saved successfully!")
+        print("Metrics saved successfully!")
     return model
     # return model, L_dice, L_loss, L_accuracy, L_precision, L_recall, L_f1_score
 
