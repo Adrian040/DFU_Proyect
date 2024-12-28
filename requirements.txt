@@ -1,0 +1,8 @@
+python==3.11.7
+pytorch==2.4.1
+torchvision==0.19.1
+pillow==10.2.0
+numpy==1.26.4
+albumentations==1.4.17
+tqdm==4.65.0
+pandas==2.1.4
