@@ -117,6 +117,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 
     scaler = torch.amp.GradScaler('cuda')
     L_dice = []
+    L_IoU = []
     L_loss = []
     L_accuracy = []
     L_precision = []
@@ -132,8 +133,9 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         scheduler.step(epoch_loss) # Update scheduler based on training loss
 
         # Check accuracy on validation set:
-        dc, acc, prec, rec, f1_s = check_metrics(val_loader, model, device=DEVICE)
+        dc, IoU, acc, prec, rec, f1_s = check_metrics(val_loader, model, device=DEVICE)
         L_dice.append(dc)
+        L_IoU.append(IoU) 
         L_accuracy.append(acc)
         L_precision.append(prec)
         L_recall.append(rec)
@@ -165,12 +167,13 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         # Save metrics for each epoch:
             # Convert L_dice and L_accuracy to NumPy arrays:
         L_dice = [x.cpu().numpy() for x in L_dice]
+        L_IoU = [x.cpu().numpy() for x in L_IoU]
         L_accuracy = [x.cpu().numpy() for x in L_accuracy]
         L_precision = [x.cpu().numpy() for x in L_precision]
         L_recall = [x.cpu().numpy() for x in L_recall]
         L_f1_score = [x.cpu().numpy() for x in L_f1_score]
             # Crear un DataFrame con las listas y las épocas
-        data = {'Epoch': range(1, len(L_dice) + 1), 'Dice Score': L_dice, 'Loss': L_loss, 'Accuracy': L_accuracy, 'Precision': L_precision, 'Recall': L_recall, 'F1 Score': L_f1_score}
+        data = {'Epoch': range(1, len(L_dice) + 1), 'Loss': L_loss, 'Dice Score': L_dice, 'IoU': L_IoU, 'Accuracy': L_accuracy, 'Precision': L_precision, 'Recall': L_recall, 'F1 Score': L_f1_score}
         df = pd.DataFrame(data)
         df.to_csv('output_assets_model/metrics.csv', index=False)     # Guardar el DataFrame en un archivo CSV
 
@@ -178,7 +181,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         plot_dice_loss(L_dice, L_loss, show_plot=False)
 
         # Save best val metrics during training in a csv file:
-        best_metrics = {'Best Dice Score': max(L_dice), 'Best Accuracy': max(L_accuracy), 'Best Precision': max(L_precision), 'Best Recall': max(L_recall), 'Best F1 Score': max(L_f1_score)}
+        best_metrics = {'Best Dice Score': max(L_dice), 'Best IoU': max(L_IoU), 'Best Accuracy': max(L_accuracy), 'Best Precision': max(L_precision), 'Best Recall': max(L_recall), 'Best F1 Score': max(L_f1_score)}
         pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training).csv', index=False)
 
         # Save parameters:
@@ -206,9 +209,10 @@ except NameError:
 # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
 # ! Esto se pasará a un script aparte durante el testing.
 print('========\n', 'Comparación de métricas de validación (después del entrenamiento)\n', '=====================')
-accuracy, dice_coefficient, precision, recall, f1_score = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, Modl, device=DEVICE, batch_size=BATCH_SIZE)
-print(f"Accuracy: {accuracy:.4f}")
+dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, Modl, device=DEVICE, batch_size=BATCH_SIZE)
 print(f"Dice Coefficient: {dice_coefficient:.4f}")
+print(f"IoU: {IoU:.4f}")
+print(f"Accuracy: {accuracy:.4f}")
 print(f"Precision: {precision:.4f}")
 print(f"Recall: {recall:.4f}")
 print(f"F1 Score: {f1_score:.4f}")

@@ -19,12 +19,13 @@ model.eval()
 # ----- Calculamos las métricas --------------
 
 print("Calculating test metrics...")
-accuracy, dice_coefficient, precision, recall, f1_score = calculate_metrics(test_image_dir, test_mask_dir, model, device=DEVICE, image_height=240, image_width=240)
+dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_metrics(test_image_dir, test_mask_dir, model, device=DEVICE, image_height=240, image_width=240)
 
 # ----- Guardamos las métricas en un archivo .csv --------------
 test_metrics = {
-    "Accuracy": accuracy,
     "Dice Coefficient": dice_coefficient,
+    "IoU": IoU,
+    "Accuracy": accuracy,
     "Precision": precision,
     "Recall": recall,
     "F1 Score": f1_score
@@ -35,8 +36,9 @@ pd.DataFrame(test_metrics, index=[0]).to_csv("output_assets_model/test_metrics.c
 
 # ----- Imprimimos las métricas (opcional) --------------
 print("Métricas calculadas:")
-print(f"Accuracy: {accuracy:.4f}")
 print(f"Dice Coefficient: {dice_coefficient:.4f}")
+print(f"IoU: {IoU:.4f}")
+print(f"Accuracy: {accuracy:.4f}")
 print(f"Precision: {precision:.4f}")
 print(f"Recall: {recall:.4f}")
 print(f"F1 Score: {f1_score:.4f}")

@@ -27,8 +27,9 @@ def check_metrics(loader, model, device="cuda"):
             false_negative += ((preds == 0) & (y == 1)).sum()
 
     # Calculate metrics:
-    accuracy = num_correct / num_pixels if num_pixels > 0 else 0 # Calculate accuracy
     dice_coefficient = dice_score / len(loader) if len(loader) > 0 else 0
+    IoU = true_positive / (true_positive + false_positive + false_negative) if (true_positive + false_positive + false_negative) > 0 else 0
+    accuracy = num_correct / num_pixels if num_pixels > 0 else 0 # Calculate accuracy
     precision = true_positive / (true_positive + false_positive) if (true_positive + false_positive) > 0 else 0
     recall = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
     f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
@@ -37,7 +38,7 @@ def check_metrics(loader, model, device="cuda"):
     print(f"Got {num_correct}/{num_pixels} with acc {accuracy*100:.3f}")
     print(f"Dice score: {dice_score/len(loader)}")
     model.train()
-    return dice_coefficient, accuracy, precision, recall, f1_score
+    return dice_coefficient, IoU, accuracy, precision, recall, f1_score
 
 
 
@@ -65,15 +66,16 @@ def calculate_metrics(test_image_dir, test_mask_dir, model, device=torch.device(
             false_positive += ((preds == 1) & (y == 0)).sum()
             false_negative += ((preds == 0) & (y == 1)).sum()
 
-    accuracy = num_correct / num_pixels if num_pixels > 0 else 0
     dice_coefficient = dice_score / len(loader) if len(loader) > 0 else 0
+    IoU = true_positive / (true_positive + false_positive + false_negative) if (true_positive + false_positive + false_negative) > 0 else 0
+    accuracy = num_correct / num_pixels if num_pixels > 0 else 0
     precision = true_positive / (true_positive + false_positive) if (true_positive + false_positive) > 0 else 0
     recall = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
     f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
     model.train() # regresarlo a su estado original si se quiere seguir entrenando el modelo.
 
-    return accuracy.item(), dice_coefficient.item(), precision.item(), recall.item(), f1_score.item()
+    return dice_coefficient.item(), IoU.item(), accuracy.item(), precision.item(), recall.item(), f1_score.item()
 
 def dice_loss(input, target):
     smooth = 1.0
