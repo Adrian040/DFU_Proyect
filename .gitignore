@@ -4,4 +4,6 @@ gpu_pytorch_prove.py
 SegmentationNetworks/Models/Unet/output_assets_model/
 SegmentationNetworks/Models/Unet/other_versions/output_assets_model_otherv
 SegmentationNetworks/Models/Unet/__pycache__
+SegmentationNetworks/data_DFU_images/__pycache__
 .codegpt
+ClasificationAlgorithms/data_TissueSegNet/data_padded/
