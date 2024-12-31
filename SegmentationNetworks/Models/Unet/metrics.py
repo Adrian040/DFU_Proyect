@@ -38,7 +38,7 @@ def check_metrics(loader, model, device="cuda"):
     print(f"Got {num_correct}/{num_pixels} with acc {accuracy*100:.3f}")
     print(f"Dice score: {dice_score/len(loader)}")
     model.train()
-    return dice_coefficient, IoU, accuracy, precision, recall, f1_score
+    return dice_coefficient.item(), IoU.item(), accuracy.item(), precision.item(), recall.item(), f1_score.item()
 
 
 

@@ -165,13 +165,6 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     if SAVE_MODEL:
         print("Saving metrics...")
         # Save metrics for each epoch:
-            # Convert L_dice and L_accuracy to NumPy arrays:
-        L_dice = [x.cpu().numpy() for x in L_dice]
-        L_IoU = [x.cpu().numpy() for x in L_IoU]
-        L_accuracy = [x.cpu().numpy() for x in L_accuracy]
-        L_precision = [x.cpu().numpy() for x in L_precision]
-        L_recall = [x.cpu().numpy() for x in L_recall]
-        L_f1_score = [x.cpu().numpy() for x in L_f1_score]
             # Crear un DataFrame con las listas y las épocas
         data = {'Epoch': range(1, len(L_dice) + 1), 'Loss': L_loss, 'Dice Score': L_dice, 'IoU': L_IoU, 'Accuracy': L_accuracy, 'Precision': L_precision, 'Recall': L_recall, 'F1 Score': L_f1_score}
         df = pd.DataFrame(data)
@@ -208,7 +201,7 @@ except NameError:
 
 # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
 # ! Esto se pasará a un script aparte durante el testing.
-print('========\n', 'Comparación de métricas de validación (después del entrenamiento)\n', '=====================')
+print('========\n', 'Comparación de métricas de validación (después del entrenamiento, con el último estado del modelo)\n', '=====================')
 dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, Modl, device=DEVICE, batch_size=BATCH_SIZE)
 print(f"Dice Coefficient: {dice_coefficient:.4f}")
 print(f"IoU: {IoU:.4f}")
