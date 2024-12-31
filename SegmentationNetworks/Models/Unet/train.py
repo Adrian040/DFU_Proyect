@@ -23,7 +23,7 @@ NUM_WORKERS = 0
 IMAGE_HEIGHT = 240
 IMAGE_WIDTH = 240
 PIN_MEMORY = True
-LOAD_MODEL = False    # True if you want to load a pre-trained model
+LOAD_MODEL = True    # True if you want to load a pre-trained model
 SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 
@@ -113,7 +113,8 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     )
 
     if LOAD_MODEL:
-        load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
+        load_checkpoint(torch.load("C:/Users/am969/Documents\DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint.pth",  weights_only=True), model)
+        print("Model loaded successfully!")
 
     scaler = torch.amp.GradScaler('cuda')
     L_dice = []
