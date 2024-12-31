@@ -1,7 +1,7 @@
 import json
 import torch
 import pandas as pd
-from main import UNET
+from main import UNET, ResUnet
 from metrics import calculate_metrics
 
 # ------------- Parámetros ----------------
@@ -12,7 +12,7 @@ test_mask_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_
 
 # ----- Cargamos el modelo entrenado con las mejores métricas ----------
 checkpoint = torch.load("output_assets_model/best_model_checkpoint.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
-model = UNET(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
+model = ResUnet(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model.load_state_dict(checkpoint["state_dict"])
 model.eval()
 
