@@ -144,7 +144,7 @@ def dice_loss_multiclass(pred, target, epsilon=1e-6):
         target = target.long()
 
     # Verifica dimensiones del target antes de one-hot
-    print(f"Dimensiones del target antes de one-hot: {target.shape}")
+    # print(f"Dimensiones del target antes de one-hot: {target.shape}")
 
     # Aplicar Softmax a las predicciones para convertir logits a probabilidades
     pred = F.softmax(pred, dim=1)
@@ -154,7 +154,7 @@ def dice_loss_multiclass(pred, target, epsilon=1e-6):
     target_one_hot = target_one_hot.squeeze(1).permute(0, 3, 1, 2).float()  # (batch_size, num_classes, H, W)
 
     # Verifica dimensiones después del procesamiento
-    print(f"Dimensiones del target después de one-hot: {target_one_hot.shape}")
+    # print(f"Dimensiones del target después de one-hot: {target_one_hot.shape}")
 
     # Calcular el Dice para cada clase
     intersection = torch.sum(pred * target_one_hot, dim=(2, 3))
