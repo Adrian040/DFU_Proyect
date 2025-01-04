@@ -43,8 +43,8 @@ def check_metrics(loader, model, num_classes = 4, prin=True, device="cuda"):
 
     if prin: # If print metrics:
         print(f"Classes:     {[cls for cls in range(num_classes)]}")
-        print(f"Acc:         {metrics['accuracy'].tolist():.4f}")
-        print(f"Dice Coeff:  {metrics['dice_coefficient'].tolist():.4f}")
+        print(f"Acc:         {[f'{acc:.4f}' for acc in metrics['accuracy']]}")
+        print(f"Dice Coeff:  {[f'{dice:.4f}' for dice in metrics['dice_coefficient']]}")
 
     dict_metrics= {key: metrics[key].tolist() for key in metrics}
     model.train()
