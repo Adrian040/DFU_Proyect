@@ -77,33 +77,6 @@ def dice_loss(input, target):
                 (iflat.sum() + tflat.sum() + smooth))
 
 
-# def dice_loss_multiclass(pred, target, epsilon=1e-6):
-#     """
-#     Calcula la Dice Loss para segmentación multiclase.
-
-#     Args:
-#         pred (torch.Tensor): Salidas del modelo (logits) de tamaño (batch_size, num_classes, H, W).
-#         target (torch.Tensor): Etiquetas verdaderas de tamaño (batch_size, H, W).
-#         epsilon (float): Pequeño valor para evitar división por cero.
-
-#     Returns:
-#         torch.Tensor: Valor escalar de la pérdida Dice.
-#     """
-#     # Aplicar Softmax a las predicciones para convertir logits a probabilidades
-#     pred = F.softmax(pred, dim=1)
-
-#     # Convertir las etiquetas a one-hot encoding
-#     target_one_hot = F.one_hot(target, num_classes=pred.shape[1]).permute(0, 3, 1, 2).float()
-
-#     # Calcular el Dice para cada clase
-#     intersection = torch.sum(pred * target_one_hot, dim=(2, 3))
-#     union = torch.sum(pred, dim=(2, 3)) + torch.sum(target_one_hot, dim=(2, 3))
-
-#     dice = (2.0 * intersection + epsilon) / (union + epsilon)
-#     dice_loss = 1 - dice.mean()
-
-#     return dice_loss
-
 def dice_loss_multiclass(pred, target, epsilon=1e-6):
     """
     Calcula la Dice Loss para segmentación multiclase.

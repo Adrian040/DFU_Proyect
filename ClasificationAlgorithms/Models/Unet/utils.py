@@ -58,60 +58,6 @@ def get_loaders(
 
     return train_loader, val_loader
 
-# def save_predictions_as_imgs(loader, model, folder="output_assets_model/saved_images/", device="cuda"):
-
-#     if not os.path.exists(folder):
-#         os.makedirs(folder)
-#     model.eval()
-
-#     # for idx, (x, y) in enumerate(loader):
-#     #     x = x.to(device=device)
-#     #     with torch.no_grad():
-#     #         preds = model(x)
-#     #         preds = torch.softmax(preds, dim=1)
-#     #         preds = torch.argmax(preds, dim=1).unsqueeze(1).float()
-#     #         print("shapee: ", preds[0].shape)
-#     #     torchvision.utils.save_image(
-#     #         preds, f"{folder}/pred_{idx}.png"
-#     #     )
-#     #     torchvision.utils.save_image(y.unsqueeze(1), f"{folder}/target_{idx}.png")
-
-#     # Definir la paleta de colores para las clases
-#     palette = [
-#         0, 0, 0,        # Clase 0 - Negro
-#         255, 0, 0,      # Clase 1 - Rojo
-#         0, 255, 0,      # Clase 2 - Verde
-#         0, 0, 255,      # Clase 3 - Azul
-#     ]
-
-#     def save_pred_as_image(pred, path, palette):
-#         """
-#         Guarda la predicción como una imagen en modo 'P' con una paleta de colores.
-
-#         Args:
-#             pred (torch.Tensor): Tensor de tamaño (H, W) con valores de clase.
-#             path (str): Ruta donde guardar la imagen.
-#             palette (list): Lista de colores en formato [R, G, B, ...].
-#         """
-#         pred = pred.cpu().numpy().astype('uint8')  # Convertir a numpy
-#         img = Image.fromarray(pred, mode='P')  # Crear imagen en modo 'P'
-#         img.putpalette(palette)  # Asignar la paleta de colores
-#         img.save(path)  # Guardar imagen
-
-#     # Proceso completo
-#     for idx, (x, y) in enumerate(loader):
-#         x = x.to(device=device)
-#         with torch.no_grad():
-#             preds = model(x)  # Salidas del modelo [4, 4, 240, 240]
-#             preds = torch.softmax(preds, dim=1)
-#             preds = torch.argmax(preds, dim=1)  # De [4, 4, 240, 240] a [4, 240, 240]
-
-#         # Guardar cada imagen en el batch
-#         for i in range(preds.shape[0]):  # Iterar sobre las imágenes del batch
-#             save_pred_as_image(preds[i], f"{folder}/pred_{idx}_{i}.png", palette)
-
-
-#     model.train()
 
 def save_predictions_as_imgs(loader, model, folder="output_assets_model/saved_images/", device="cuda"):
     if not os.path.exists(folder):
@@ -120,10 +66,10 @@ def save_predictions_as_imgs(loader, model, folder="output_assets_model/saved_im
 
     # Define a color palette for the 4 classes
     palette = [
-        0, 0, 0,        # Class 0: Black
-        255, 0, 0,      # Class 1: Red
-        0, 255, 0,      # Class 2: Green
-        0, 0, 255,      # Class 3: Blue
+        0, 0, 0,        # Class 0: Black (Background)
+        255, 0, 0,      # Class 1: Red (Fibrin)
+        0, 255, 0,      # Class 2: Green (Granulation)
+        0, 0, 255,      # Class 3: Blue (Callus)
     ]
 
     for idx, (x, y) in enumerate(loader):
@@ -141,8 +87,15 @@ def save_predictions_as_imgs(loader, model, folder="output_assets_model/saved_im
         target_img = Image.fromarray(y[0].cpu().numpy().astype(np.uint8), mode='P')
         target_img.putpalette(palette)
 
-        pred_img.save(f"{folder}/pred_{idx}.png")
-        target_img.save(f"{folder}/target_{idx}.png")
+        # Create a new image with width = sum of both images' widths and height = max of both images' heights
+        combined_img = Image.new('RGB', (pred_img.width + target_img.width, max(pred_img.height, target_img.height)))
+
+        # Paste pred_img and target_img into the combined image
+        combined_img.paste(pred_img, (0, 0))
+        combined_img.paste(target_img, (pred_img.width, 0))
+
+        # Save the combined image
+        combined_img.save(f"{folder}/combined_{idx}.png")
 
     model.train()
 
