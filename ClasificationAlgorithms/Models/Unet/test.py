@@ -23,7 +23,9 @@ print("Calculating test metrics...")
 dict_test_metrics = calculate_metrics(test_image_dir, test_mask_dir, model, num_classes=4, device=DEVICE, image_height=img_size_for_test, image_width=img_size_for_test)
 
 # ----- Guardamos las métricas en un archivo .csv --------------
-pd.DataFrame(dict_test_metrics).to_csv("output_assets_model/test_metrics.csv", index=False) # Sin índices.
+df_test_metrics = pd.DataFrame(dict_test_metrics, index=[0,1,2,3])
+df_test_metrics.index.name = 'Class'
+df_test_metrics.to_csv("output_assets_model/test_metrics.csv", index=True) # Sin índices.
 # # Guardar las métricas en un archivo JSON
 # with open("output_assets_model/test_metrics.json", "w") as outfile:
 #     json.dump(test_metrics, outfile)
