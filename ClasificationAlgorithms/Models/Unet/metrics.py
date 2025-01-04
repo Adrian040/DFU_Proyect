@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import numpy as np
 from utils import get_test_loader
 
-def check_metrics(loader, model, num_classes = 4, device="cuda"):
+def check_metrics(loader, model, num_classes = 4, prin=True, device="cuda"):
     """Calcula las métricas de evaluación de un modelo de segmentación multiclase (opcional) en un conjunto de datos de validación."""
     metrics = {
         "dice_coefficient": torch.zeros(num_classes, device=device),
@@ -41,15 +41,10 @@ def check_metrics(loader, model, num_classes = 4, device="cuda"):
     for key in metrics:
         metrics[key] /= class_counts
 
-    # Print metrics:
-    for cls in range(num_classes):
-        print(f"Class {cls}:")
-        print(f"  Dice Coefficient: {metrics['dice_coefficient'][cls].item():.4f}")
-        print(f"  IoU: {metrics['IoU'][cls].item():.4f}")
-        print(f"  Accuracy: {metrics['accuracy'][cls].item():.4f}")
-        print(f"  Precision: {metrics['precision'][cls].item():.4f}")
-        print(f"  Recall: {metrics['recall'][cls].item():.4f}")
-        print(f"  F1 Score: {metrics['f1_score'][cls].item():.4f}")
+    if prin: # If print metrics:
+        print(f"Classes:     {[cls for cls in range(num_classes)]}")
+        print(f"Acc:         {metrics['accuracy'].tolist():.4f}")
+        print(f"Dice Coeff:  {metrics['dice_coefficient'].tolist():.4f}")
 
     dict_metrics= {key: metrics[key].tolist() for key in metrics}
     model.train()
@@ -60,8 +55,7 @@ def calculate_metrics(test_image_dir, test_mask_dir, model, num_classes=4, devic
     model.eval()
     loader = get_test_loader(test_image_dir, test_mask_dir, batch_size= batch_size,  image_height=image_height, image_width=image_width, num_workers=num_workers, pin_memory=pin_memory)   # Cargar los datos.
 
-    dict_metrics = check_metrics(loader, model, num_classes=num_classes, device=device)  # Calcular las métricas.
-    
+    dict_metrics = check_metrics(loader, model, num_classes=num_classes, prin=False, device=device)  # Calcular las métricas.
     model.train() # regresarlo a su estado original si se quiere seguir entrenando el modelo.
 
     return dict_metrics
