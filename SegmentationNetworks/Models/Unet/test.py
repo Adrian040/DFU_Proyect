@@ -36,6 +36,13 @@ pd.DataFrame(test_metrics, index=[0]).to_csv("output_assets_model/test_metrics.c
 
 # ----- Imprimimos las métricas (opcional) --------------
 print("Métricas calculadas para el test set:")
+print(pd.DataFrame(test_metrics))
+
+# ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
+VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_images"
+VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_masks"
+print('========\n', 'Comparación de métricas de validación (después del entrenamiento, con el mejor estado del modelo)\n', '=====================')
+dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, model, device=DEVICE, batch_size=4)
 print(f"Dice Coefficient: {dice_coefficient:.4f}")
 print(f"IoU: {IoU:.4f}")
 print(f"Accuracy: {accuracy:.4f}")

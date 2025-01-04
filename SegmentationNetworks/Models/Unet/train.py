@@ -198,15 +198,3 @@ try:
 except NameError:
     print("Número inválido. Se entrenará con 10 épocas por default.")
     Modl = main()
-
-
-# ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
-# ! Esto se pasará a un script aparte durante el testing.
-print('========\n', 'Comparación de métricas de validación (después del entrenamiento, con el último estado del modelo)\n', '=====================')
-dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, Modl, device=DEVICE, batch_size=BATCH_SIZE)
-print(f"Dice Coefficient: {dice_coefficient:.4f}")
-print(f"IoU: {IoU:.4f}")
-print(f"Accuracy: {accuracy:.4f}")
-print(f"Precision: {precision:.4f}")
-print(f"Recall: {recall:.4f}")
-print(f"F1 Score: {f1_score:.4f}")
