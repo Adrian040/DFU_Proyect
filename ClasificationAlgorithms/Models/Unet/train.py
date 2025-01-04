@@ -8,7 +8,7 @@ from tqdm import tqdm
 import time
 import torch.optim as optim
 from main import UNET
-from metrics import check_metrics, dice_loss, dice_loss_multiclass, calculate_metrics
+from metrics import check_metrics, dice_loss_multiclass, calculate_metrics
 from utils import save_predictions_as_imgs, load_checkpoint, get_loaders, plot_dice_loss, concat_dicts_to_dataframe_reset_index
 
 
@@ -135,7 +135,8 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 
         if SAVE_MODEL:
             # Save best model, based in dice score:
-            if epoch_loss < best_loss:
+            if epoch_loss > best_loss:
+                print(f"Model saved with loss: {epoch_loss}")
                 best_loss = epoch_loss
                 checkpoint = {
                     "state_dict": model.state_dict(),
@@ -160,13 +161,24 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         df_metrics = concat_dicts_to_dataframe_reset_index(L_dicts_metrics)
         df_metrics.to_csv('output_assets_model/metrics_per_epoch.csv', index=False)
         
-        # Plot Dice and Loss:
-        L_dice_0 = df_metrics[df_metrics.index == 0]['dice_coefficient'].tolist()
+        # Plot Dice (for class 0 only, it can be any class but just one at time) and Loss:
+        L_dice_0 = df_metrics[df_metrics.Class == 0]['dice_coefficient'].tolist()
         plot_dice_loss(L_dice_0, L_loss, show_plot=False)
 
-        # # Save best val metrics during training in a csv file:
-        # best_metrics = {'Best Dice Score': max(L_dice), 'Best IoU': max(L_IoU), 'Best Accuracy': max(L_accuracy), 'Best Precision': max(L_precision), 'Best Recall': max(L_recall), 'Best F1 Score': max(L_f1_score)}
-        # pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training).csv', index=False)
+        # Save best val metrics during training in a csv file:
+
+        cols = ['Best Dice Score', 'Best IoU', 'Best Accuracy', 'Best Precision', 'Best Recall', 'Best F1 Score']
+        print("aaaaa: ", df_metrics.Class == 0)
+        print("aaaaa: ", df_metrics[df_metrics.Class == 0]['dice_coefficient'])
+        best_metrics_c0 = [max(df_metrics[df_metrics.Class == 0]['dice_coefficient']), max(df_metrics[df_metrics.Class == 0]['IoU']), max(df_metrics[df_metrics.Class == 0]['accuracy']), max(df_metrics[df_metrics.Class == 0]['precision']), max(df_metrics[df_metrics.Class == 0]['recall']), max(df_metrics[df_metrics.Class == 0]['f1_score'])]
+        best_metrics_c1 = [max(df_metrics[df_metrics.Class == 1]['dice_coefficient']), max(df_metrics[df_metrics.Class == 1]['IoU']), max(df_metrics[df_metrics.Class == 1]['accuracy']), max(df_metrics[df_metrics.Class == 1]['precision']), max(df_metrics[df_metrics.Class == 1]['recall']), max(df_metrics[df_metrics.Class == 1]['f1_score'])]
+        best_metrics_c2 = [max(df_metrics[df_metrics.Class == 2]['dice_coefficient']), max(df_metrics[df_metrics.Class == 2]['IoU']), max(df_metrics[df_metrics.Class == 2]['accuracy']), max(df_metrics[df_metrics.Class == 2]['precision']), max(df_metrics[df_metrics.Class == 2]['recall']), max(df_metrics[df_metrics.Class == 2]['f1_score'])]
+        best_metrics_c3 = [max(df_metrics[df_metrics.Class == 3]['dice_coefficient']), max(df_metrics[df_metrics.Class == 3]['IoU']), max(df_metrics[df_metrics.Class == 3]['accuracy']), max(df_metrics[df_metrics.Class == 3]['precision']), max(df_metrics[df_metrics.Class == 3]['recall']), max(df_metrics[df_metrics.Class == 3]['f1_score'])]
+        print(best_metrics_c0)
+        # best_metrics = concat_dicts_to_dataframe_reset_index([best_metrics_c0, best_metrics_c1, best_metrics_c2, best_metrics_c3], epoch_col=False)
+        best_metrics_df = pd.DataFrame([best_metrics_c0, best_metrics_c1, best_metrics_c2, best_metrics_c3], columns=cols, index=[0, 1, 2, 3])
+        best_metrics_df.index.name = 'Class'
+        best_metrics_df.to_csv('output_assets_model/best_metrics_val(during_training).csv', index=True)
 
         # Save parameters:
         parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4)}
@@ -188,15 +200,3 @@ try:
 except NameError:
     print("Número inválido. Se entrenará con 10 épocas por default.")
     Modl = main()
-
-
-# # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
-# # ! Esto se pasará a un script aparte durante el testing.
-# print('========\n', 'Comparación de métricas de validación (después del entrenamiento, con el último estado del modelo)\n', '=====================')
-# dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, Modl, device=DEVICE, batch_size=BATCH_SIZE)
-# print(f"Dice Coefficient: {dice_coefficient:.4f}")
-# print(f"IoU: {IoU:.4f}")
-# print(f"Accuracy: {accuracy:.4f}")
-# print(f"Precision: {precision:.4f}")
-# print(f"Recall: {recall:.4f}")
-# print(f"F1 Score: {f1_score:.4f}")
