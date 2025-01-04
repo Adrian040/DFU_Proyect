@@ -9,7 +9,7 @@ import time
 import torch.optim as optim
 from main import UNET
 from metrics import check_metrics, dice_loss_multiclass, calculate_metrics
-from utils import save_predictions_as_imgs, load_checkpoint, get_loaders, plot_dice_loss, concat_dicts_to_dataframe_reset_index
+from utils import save_predictions_as_imgs, load_checkpoint, get_loaders, plot_dice_loss, concat_dicts_to_dataframe
 
 
 # ------------------- Parámetros de entrenamiento --------------------
@@ -158,7 +158,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     if SAVE_MODEL:
         print("Saving metrics...")
         # Save metrics for each epoch:
-        df_metrics = concat_dicts_to_dataframe_reset_index(L_dicts_metrics)
+        df_metrics = concat_dicts_to_dataframe(L_dicts_metrics)
         df_metrics.to_csv('output_assets_model/metrics_per_epoch.csv', index=False)
         
         # Plot Dice (for class 0 only, it can be any class but just one at time) and Loss:
@@ -166,16 +166,11 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         plot_dice_loss(L_dice_0, L_loss, show_plot=False)
 
         # Save best val metrics during training in a csv file:
-
         cols = ['Best Dice Score', 'Best IoU', 'Best Accuracy', 'Best Precision', 'Best Recall', 'Best F1 Score']
-        print("aaaaa: ", df_metrics.Class == 0)
-        print("aaaaa: ", df_metrics[df_metrics.Class == 0]['dice_coefficient'])
         best_metrics_c0 = [max(df_metrics[df_metrics.Class == 0]['dice_coefficient']), max(df_metrics[df_metrics.Class == 0]['IoU']), max(df_metrics[df_metrics.Class == 0]['accuracy']), max(df_metrics[df_metrics.Class == 0]['precision']), max(df_metrics[df_metrics.Class == 0]['recall']), max(df_metrics[df_metrics.Class == 0]['f1_score'])]
         best_metrics_c1 = [max(df_metrics[df_metrics.Class == 1]['dice_coefficient']), max(df_metrics[df_metrics.Class == 1]['IoU']), max(df_metrics[df_metrics.Class == 1]['accuracy']), max(df_metrics[df_metrics.Class == 1]['precision']), max(df_metrics[df_metrics.Class == 1]['recall']), max(df_metrics[df_metrics.Class == 1]['f1_score'])]
         best_metrics_c2 = [max(df_metrics[df_metrics.Class == 2]['dice_coefficient']), max(df_metrics[df_metrics.Class == 2]['IoU']), max(df_metrics[df_metrics.Class == 2]['accuracy']), max(df_metrics[df_metrics.Class == 2]['precision']), max(df_metrics[df_metrics.Class == 2]['recall']), max(df_metrics[df_metrics.Class == 2]['f1_score'])]
         best_metrics_c3 = [max(df_metrics[df_metrics.Class == 3]['dice_coefficient']), max(df_metrics[df_metrics.Class == 3]['IoU']), max(df_metrics[df_metrics.Class == 3]['accuracy']), max(df_metrics[df_metrics.Class == 3]['precision']), max(df_metrics[df_metrics.Class == 3]['recall']), max(df_metrics[df_metrics.Class == 3]['f1_score'])]
-        print(best_metrics_c0)
-        # best_metrics = concat_dicts_to_dataframe_reset_index([best_metrics_c0, best_metrics_c1, best_metrics_c2, best_metrics_c3], epoch_col=False)
         best_metrics_df = pd.DataFrame([best_metrics_c0, best_metrics_c1, best_metrics_c2, best_metrics_c3], columns=cols, index=[0, 1, 2, 3])
         best_metrics_df.index.name = 'Class'
         best_metrics_df.to_csv('output_assets_model/best_metrics_val(during_training).csv', index=True)
@@ -189,7 +184,6 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 
         print("Metrics saved successfully!")
     return model
-    # return model, L_dice, L_loss, L_accuracy, L_precision, L_recall, L_f1_score
 
 
 # ------------------- Entrenamiento -------------------

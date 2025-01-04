@@ -171,7 +171,7 @@ def get_test_loader(test_image_dir, test_mask_dir, batch_size=4, image_height=24
     return test_loader
 
 
-def concat_dicts_to_dataframe_reset_index(dict_list, reset_threshold=4):
+def concat_dicts_to_dataframe(dict_list, reset_threshold=4):
     """
     Convierte una lista de diccionarios en DataFrames, los concatena en un único DataFrame,
     En este caso el umbral 4 indica que el índice se repetirá en 4 épocas consecutivas e irá avanzando en orden ascendente normal (Cada 4 renglones es otra época).
@@ -186,11 +186,15 @@ def concat_dicts_to_dataframe_reset_index(dict_list, reset_threshold=4):
     """
     # Convertir cada diccionario en un DataFrame
     dataframes = [pd.DataFrame(d) for d in dict_list]
-    
+
     # Concatenar todos los DataFrames
     concatenated_df = pd.concat(dataframes, ignore_index=True)
     
     # Crear una nueva columna de índice que se repite cada 4 renglones y avanza en orden ascendente
     concatenated_df['Epoch'] = [((i // reset_threshold) + 1) for i in range(len(concatenated_df))]
+    concatenated_df['Class'] = [num for i in range(len(dict_list)) for num in range(4)]
+    # Reordenar las columnas para que 'Epoch' sea la primera columna
+    cols = ['Class', 'Epoch'] + [col for col in concatenated_df.columns if (col != 'Epoch' and col != 'Class')]
+    concatenated_df = concatenated_df[cols]
     
     return concatenated_df
