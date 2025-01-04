@@ -37,5 +37,5 @@ print(pd.DataFrame(dict_test_metrics))
 VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_images"
 VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_masks"
 print('========\n', 'Métricas de validación (después del entrenamiento, con el mejor estado del modelo)\n', '=====================')
-dict_val_metrics = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, model,model, num_classes=4, device=DEVICE, image_height=img_size_for_test, image_width=img_size_for_test)
+dict_val_metrics = calculate_metrics(VAL_IMG_DIR, VAL_MASK_DIR, model, num_classes=4, device=DEVICE, image_height=img_size_for_test, image_width=img_size_for_test)
 print(pd.DataFrame(dict_val_metrics))
