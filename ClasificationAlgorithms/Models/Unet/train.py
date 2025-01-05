@@ -26,6 +26,9 @@ PIN_MEMORY = True
 LOAD_MODEL = False    # True if you want to load a pre-trained model
 SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
+# For early stopping
+EARLY_STOP = True # True to activate early stopping
+PATIENCE = 10 # for early stopping
 
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_masks"
@@ -121,10 +124,13 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     L_dicts_metrics = []  # Lista de diccionarios de métricas de cada época
     L_loss = []  # Lista de pérdidas
     best_loss = 0.0
+    cnt_patience = 0
 
     start_time = time.time()
     for epoch in range(NUM_EPOCHS):
         print(f"Epoch: {epoch + 1}")
+
+        # Train the model:
         epoch_loss = train_fn(train_loader, model, optimizer, loss_fn, scaler)
         L_loss.append(epoch_loss)
         scheduler.step(epoch_loss) # Update scheduler based on training loss
@@ -134,10 +140,13 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         L_dicts_metrics.append(dict_metrics_per_class)
 
         if SAVE_MODEL:
-            # Save best model, based in dice score:
+            # Save best model, based in loss:
             if epoch_loss > best_loss:
                 print(f"Model saved with loss: {epoch_loss}")
                 best_loss = epoch_loss
+                best_model_epoch = epoch
+                cnt_patience += 1
+
                 checkpoint = {
                     "state_dict": model.state_dict(),
                     "optimizer": optimizer.state_dict(),
@@ -149,11 +158,18 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 # torch.save(checkpoint, "my_checkpoint.pth.tar")
                 with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
                     zipf.write("output_assets_model/best_model_checkpoint.pth")
-
-            # Save some example predictions to a folder
-            if SAVE_IMS:
-                save_predictions_as_imgs( val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
+            else:
+                cnt_patience = 0 # Resetear el contador de paciencia si el modelo no mejora.
+        # Early stopping
+        if EARLY_STOP and cnt_patience >= PATIENCE:
+            print(f"Early stopping at epoch: {epoch:04d}")
+            break
+            
+        # Save some example predictions to a folder
+        if SAVE_IMS:
+            save_predictions_as_imgs( val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
     end_time = time.time()
+
 
     if SAVE_MODEL:
         print("Saving metrics...")
@@ -176,12 +192,13 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         best_metrics_df.to_csv('output_assets_model/best_metrics_val(during_training).csv', index=True)
 
         # Save parameters:
-        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4)}
+        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4), 'Best_model_epoch': best_model_epoch, 'Early Stopping': EARLY_STOP, 'Patience': PATIENCE}  
         pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters.csv', index=False)    # Guardar los parámetros en un archivo CSV
             # Guardar los parámetros como un archivo .json:
         with open('output_assets_model/parameters.json', 'w') as json_file:
             json.dump(parameters, json_file, indent=4)
 
+        print('Best model epoch:', best_model_epoch)
         print("Metrics saved successfully!")
     return model
 
