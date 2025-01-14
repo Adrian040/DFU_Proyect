@@ -128,6 +128,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     L_dicts_metrics = []  # Lista de diccionarios de métricas de cada época
     L_loss = []  # Lista de pérdidas
     best_loss = 0.0
+    best_dice = 0.0
     cnt_patience = 0
 
     start_time = time.time()
@@ -141,15 +142,20 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 
         # Check accuracy on validation set:
         dict_metrics_per_class = check_metrics(val_loader, model, device=DEVICE)
+        epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])  # Coeficiente dice promedio de todas las clases en la época correspondiente
         L_dicts_metrics.append(dict_metrics_per_class)
+        print(f"mean dice: {epoch_mean_dice}")
 
         if SAVE_MODEL:
             if epoch == 1:
                 best_loss = epoch_loss
+                best_dice = epoch_mean_dice
             # Save best model, based in loss:
-            if epoch_loss <= best_loss:
-                print(f"Model saved with loss: {epoch_loss}")
+            # if epoch_loss <= best_loss:
+            if epoch_mean_dice >= best_dice:
+                print(f"Model saved with loss: {epoch_loss} and mean dice: {epoch_mean_dice}")
                 best_loss = epoch_loss
+                best_dice = epoch_mean_dice
                 best_model_epoch = epoch
                 cnt_patience = 0
 
