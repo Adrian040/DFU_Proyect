@@ -160,10 +160,10 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 # torch.save(checkpoint, f"model_checkpoint_epoch_{epoch+1}.pth")
 
                 # Guardar el modelo en .pth y en .zip:
-                torch.save(checkpoint, "output_assets_model/best_model_checkpoint.pth")
+                torch.save(checkpoint, "output_assets_model/best_model_checkpoint2.pth")
                 # torch.save(checkpoint, "my_checkpoint.pth.tar")
-                with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
-                    zipf.write("output_assets_model/best_model_checkpoint.pth")
+                with zipfile.ZipFile("output_assets_model/best_model_checkpoint2.zip", 'w') as zipf:
+                    zipf.write("output_assets_model/best_model_checkpoint2.pth")
             else:
                 cnt_patience += 1 # Resetear el contador de paciencia si el modelo no mejora.
         # Early stopping
