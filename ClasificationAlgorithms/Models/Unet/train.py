@@ -140,12 +140,14 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         L_dicts_metrics.append(dict_metrics_per_class)
 
         if SAVE_MODEL:
+            if epoch == 1:
+                best_loss = epoch_loss
             # Save best model, based in loss:
-            if epoch_loss > best_loss:
+            if epoch_loss <= best_loss:
                 print(f"Model saved with loss: {epoch_loss}")
                 best_loss = epoch_loss
                 best_model_epoch = epoch
-                cnt_patience += 1
+                cnt_patience = 0
 
                 checkpoint = {
                     "state_dict": model.state_dict(),
@@ -159,15 +161,16 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
                     zipf.write("output_assets_model/best_model_checkpoint.pth")
             else:
-                cnt_patience = 0 # Resetear el contador de paciencia si el modelo no mejora.
+                cnt_patience += 1 # Resetear el contador de paciencia si el modelo no mejora.
         # Early stopping
         if EARLY_STOP and cnt_patience >= PATIENCE:
-            print(f"Early stopping at epoch: {epoch:04d}")
+            print(f"===Early stopping at epoch: {epoch:04d}===")
             break
             
         # Save some example predictions to a folder
         if SAVE_IMS:
-            save_predictions_as_imgs( val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
+            print("saving image in training...")
+            save_predictions_as_imgs(val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
     end_time = time.time()
 
 
@@ -207,6 +210,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 num_ep = input("Enter # of epochs: ")
 # Modl = main(NUM_EPOCHS=int(num_ep))
 try:
+    print("Training for ", num_ep, " epochs.")
     Modl = main(NUM_EPOCHS=int(num_ep))
 except NameError:
     print("Número inválido. Se entrenará con 10 épocas por default.")
