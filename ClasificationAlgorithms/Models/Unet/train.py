@@ -6,6 +6,7 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import time
+import numpy as np
 import torch.optim as optim
 from main import UNET
 from metrics import check_metrics, dice_loss_multiclass, calculate_metrics
@@ -29,6 +30,9 @@ SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y su
 # For early stopping
 EARLY_STOP = True # True to activate early stopping
 PATIENCE = 10 # for early stopping
+# Dropout
+dropout = True
+p_dropout = 0.35
 
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_masks"
@@ -97,7 +101,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         ],
     )
 
-    model = UNET(in_channels=3, out_channels=4).to(DEVICE)
+    model = UNET(in_channels=3, out_channels=4, impl_dropout = dropout, prob_dropout=p_dropout).to(DEVICE)
     # loss_fn = nn.BCEWithLogitsLoss()
     # loss_fn = dice_loss
     loss_fn = dice_loss_multiclass
@@ -195,7 +199,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         best_metrics_df.to_csv('output_assets_model/best_metrics_val(during_training).csv', index=True)
 
         # Save parameters:
-        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4), 'Best_model_epoch': best_model_epoch, 'Early Stopping': EARLY_STOP, 'Patience': PATIENCE}  
+        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4), 'Best_model_epoch': best_model_epoch, 'Early Stopping': EARLY_STOP, 'Patience': PATIENCE, 'Dropout' : dropout, 'Prob. Dropout' : 0.0 if not dropout else p_dropout}  
         pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters.csv', index=False)    # Guardar los parámetros en un archivo CSV
             # Guardar los parámetros como un archivo .json:
         with open('output_assets_model/parameters.json', 'w') as json_file:

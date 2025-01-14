@@ -27,13 +27,14 @@ class DoubleConv(nn.Module):
         return self.conv(x)
 
 # Implement Dropout:
-impl_dropout = True
-prob_dropout = 0.4
+# impl_dropout = True
+# prob_dropout = 0.4
 
 # Clase principal de la Unet:
 class UNET(nn.Module):
     def __init__(
         self, in_channels=3, out_channels=1, features=[64, 128, 256, 512],
+        impl_dropout = False, prob_dropout = 0.5
     ):
         super(UNET, self).__init__()
         self.downs = nn.ModuleList()
