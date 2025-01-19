@@ -94,7 +94,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         ],
     )
 
-    model = ResUnet(in_channels=3, out_channels=1).to(DEVICE)
+    model = UNET(in_channels=3, out_channels=1).to(DEVICE)
     # loss_fn = nn.BCEWithLogitsLoss()
     loss_fn = dice_loss
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
