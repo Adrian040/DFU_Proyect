@@ -36,7 +36,16 @@ def check_metrics(loader, model, prin=True, device="cuda"):
         print(f"Acc: {accuracy*100:.3f}")
         print(f"Dice score: {dice_score/len(loader)}")
     model.train()
-    return dice_coefficient.item(), IoU.item(), accuracy.item(), precision.item(), recall.item(), f1_score.item()
+
+    dice_coefficient = dice_coefficient.item() if isinstance(dice_coefficient, torch.Tensor) else dice_coefficient
+    IoU = IoU.item() if isinstance(IoU, torch.Tensor) else IoU
+    accuracy = accuracy.item() if isinstance(accuracy, torch.Tensor) else accuracy
+    precision = precision.item() if isinstance(precision, torch.Tensor) else precision
+    recall = recall.item() if isinstance(recall, torch.Tensor) else recall
+    f1_score = f1_score.item() if isinstance(f1_score, torch.Tensor) else f1_score
+
+    return dice_coefficient, IoU, accuracy, precision, recall, f1_score
+    # return dice_coefficient.item(), IoU.item(), accuracy.item(), precision.item(), recall.item(), f1_score.item()
 
 
 def calculate_metrics(test_image_dir, test_mask_dir, model, device=torch.device("cuda" if torch.cuda.is_available() else "cpu"), image_height=240, image_width=240, num_workers=0, batch_size=4, pin_memory=True):
@@ -46,7 +55,7 @@ def calculate_metrics(test_image_dir, test_mask_dir, model, device=torch.device(
     dice_coefficient, IoU, accuracy, precision, recall, f1_score = check_metrics(loader, model, prin=False, device=device) # Calculate metrics
     model.train() # regresarlo a su estado original si se quiere seguir entrenando el modelo.
 
-    return dice_coefficient.item(), IoU.item(), accuracy.item(), precision.item(), recall.item(), f1_score.item()
+    return dice_coefficient, IoU, accuracy, precision, recall, f1_score
 
 
 def dice_loss(input, target):

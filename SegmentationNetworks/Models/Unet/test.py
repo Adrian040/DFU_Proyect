@@ -36,7 +36,7 @@ pd.DataFrame(test_metrics, index=[0]).to_csv("output_assets_model/test_metrics.c
 
 # ----- Imprimimos las métricas (opcional) --------------
 print("Métricas calculadas para el test set:")
-print(pd.DataFrame(test_metrics))
+print(pd.DataFrame(test_metrics, index=[0]))
 
 # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
 VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_images"
