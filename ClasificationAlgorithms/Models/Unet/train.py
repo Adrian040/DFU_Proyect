@@ -16,7 +16,7 @@ from utils import save_predictions_as_imgs, load_checkpoint, get_loaders, plot_d
 # ------------------- Parámetros de entrenamiento --------------------
 
 NUM_EPOCHS = 10
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Device: ",DEVICE, "is available \n ----------------------")
 BATCH_SIZE = 4
@@ -29,10 +29,10 @@ SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 # For early stopping
 EARLY_STOP = True # True to activate early stopping
-PATIENCE = 10 # for early stopping
+PATIENCE = 50 # for early stopping
 # Dropout
 dropout = True
-p_dropout = 0.35
+p_dropout = 0.30
 
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_masks"
@@ -150,7 +150,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
             if epoch == 1:
                 best_loss = epoch_loss
                 best_dice = epoch_mean_dice
-            # Save best model, based in loss:
+            # Save best model, based in dice:
             # if epoch_loss <= best_loss:
             if epoch_mean_dice >= best_dice:
                 print(f"Model saved with loss: {epoch_loss} and mean dice: {epoch_mean_dice}")

@@ -170,6 +170,34 @@ def get_test_loader(test_image_dir, test_mask_dir, batch_size=4, image_height=24
 
     return test_loader
 
+def get_preds_loader(image_dir, batch_size=4, image_height=240, image_width=240, num_workers=0, pin_memory=True):
+    val_transforms = A.Compose(
+        [
+            A.Resize(height=image_height, width=image_width),
+            A.Normalize(
+                mean=[0.0, 0.0, 0.0],
+                std=[1.0, 1.0, 1.0],
+                max_pixel_value=255.0,
+            ),
+            ToTensorV2(),
+        ]
+    )
+
+    preds_ds = DFUTissueDataset(
+        image_dir=image_dir,
+        transform=val_transforms,
+    )
+
+    preds_loader = DataLoader(
+        preds_ds,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        shuffle=False,
+    )
+
+    return preds_loader
+
 
 def concat_dicts_to_dataframe(dict_list, reset_threshold=4):
     """
