@@ -9,9 +9,7 @@ ClasificationAlgorithms/data_TissueSegNet/data_padded/
 ClasificationAlgorithms/Models/Unet/output_assets_model/
 ClasificationAlgorithms/Models/Unet/__pycache__
 ClasificationAlgorithms/Pruebas_API_Implementation
-.codegpt
 
-SegmentationNetworks/data_DFU_images/Images_Gerardo/pseudo_masks
-SegmentationNetworks/Models/Unet/pseudo_masks.py
-SegmentationNetworks/Models/Unet/pseudo_masks_ger.py
 SegmentationNetworks/data_DFU_images/Images_Gerardo/new_masks_68
+SegmentationNetworks/data_DFU_images/Images_Gerardo/new_maks_4classes_68
+.codegpt
