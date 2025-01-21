@@ -16,7 +16,7 @@ from utils import save_predictions_as_imgs, load_checkpoint, get_loaders, plot_d
 # ------------------- Parámetros de entrenamiento --------------------
 
 NUM_EPOCHS = 10
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Device: ",DEVICE, "is available \n ----------------------")
 BATCH_SIZE = 4
@@ -29,10 +29,10 @@ SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 # For early stopping
 EARLY_STOP = True # True to activate early stopping
-PATIENCE = 10 # for early stopping
+PATIENCE = 50 # for early stopping
 # Dropout
 dropout = True
-p_dropout = 0.35
+p_dropout = 0.30
 
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_masks"
@@ -127,6 +127,8 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     scaler = torch.amp.GradScaler('cuda')
     L_dicts_metrics = []  # Lista de diccionarios de métricas de cada época
     L_loss = []  # Lista de pérdidas
+    L_mean_dices = []
+    best_dice = 0.0
     best_loss = 0.0
     best_dice = 0.0
     cnt_patience = 0
@@ -142,19 +144,21 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 
         # Check accuracy on validation set:
         dict_metrics_per_class = check_metrics(val_loader, model, device=DEVICE)
-        epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])  # Coeficiente dice promedio de todas las clases en la época correspondiente
+        epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])  # Coeficiente dice promedio de todas las clases en la época actual
         L_dicts_metrics.append(dict_metrics_per_class)
         print(f"mean dice: {epoch_mean_dice}")
+        L_mean_dices.append(epoch_mean_dice)
 
         if SAVE_MODEL:
             if epoch == 1:
                 best_loss = epoch_loss
                 best_dice = epoch_mean_dice
-            # Save best model, based in loss:
+            # Save best model, based in dice:
             # if epoch_loss <= best_loss:
             if epoch_mean_dice >= best_dice:
                 print(f"Model saved with loss: {epoch_loss} and mean dice: {epoch_mean_dice}")
                 best_loss = epoch_loss
+                best_dice = epoch_mean_dice
                 best_dice = epoch_mean_dice
                 best_model_epoch = epoch
                 cnt_patience = 0
@@ -166,10 +170,10 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 # torch.save(checkpoint, f"model_checkpoint_epoch_{epoch+1}.pth")
 
                 # Guardar el modelo en .pth y en .zip:
-                torch.save(checkpoint, "output_assets_model/best_model_checkpoint.pth")
+                torch.save(checkpoint, "output_assets_model/best_model_checkpoint2.pth")
                 # torch.save(checkpoint, "my_checkpoint.pth.tar")
-                with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
-                    zipf.write("output_assets_model/best_model_checkpoint.pth")
+                with zipfile.ZipFile("output_assets_model/best_model_checkpoint2.zip", 'w') as zipf:
+                    zipf.write("output_assets_model/best_model_checkpoint2.pth")
             else:
                 cnt_patience += 1 # Resetear el contador de paciencia si el modelo no mejora.
         # Early stopping
@@ -191,8 +195,8 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         df_metrics.to_csv('output_assets_model/metrics_per_epoch.csv', index=False)
         
         # Plot Dice (for class 0 only, it can be any class but just one at time) and Loss:
-        L_dice_0 = df_metrics[df_metrics.Class == 0]['dice_coefficient'].tolist()
-        plot_dice_loss(L_dice_0, L_loss, show_plot=False)
+        # L_dice_0 = df_metrics[df_metrics.Class == 0]['dice_coefficient'].tolist()  # Este es para graficar el dice de una sola clase, en este caso está la clase 0 (el background)
+        plot_dice_loss(L_mean_dices, L_loss, show_plot=False)
 
         # Save best val metrics during training in a csv file:
         cols = ['Best Dice Score', 'Best IoU', 'Best Accuracy', 'Best Precision', 'Best Recall', 'Best F1 Score']

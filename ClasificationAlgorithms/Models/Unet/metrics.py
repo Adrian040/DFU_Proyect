@@ -50,6 +50,72 @@ def check_metrics(loader, model, num_classes = 4, prin=True, device="cuda"):
     model.train()
     return dict_metrics
 
+
+def check_double_metrics(loader, model1, model2, num_classes = 4, prin=True, device="cuda"):
+    """Calcula las métricas de evaluación de un modelo de segmentación multiclase (opcional) en un conjunto de datos de validación."""
+    metrics = {
+        "dice_coefficient": torch.zeros(num_classes, device=device),
+        "IoU": torch.zeros(num_classes, device=device),
+        "accuracy": torch.zeros(num_classes, device=device),
+        "precision": torch.zeros(num_classes, device=device),
+        "recall": torch.zeros(num_classes, device=device),
+        "f1_score": torch.zeros(num_classes, device=device),
+    }
+    class_counts = torch.zeros(num_classes, device=device)
+    
+    model1.eval()
+    model2.eval()
+
+    with torch.no_grad():
+        for x, y in loader:
+            x = x.to(device)
+            y = y.to(device)
+            preds1 = model1(x)
+            preds2 = model2(x)
+            preds_mean = (preds1 + preds2) / 2
+            preds = torch.softmax(preds_mean, dim=1)
+            preds = torch.argmax(preds, dim=1)
+
+            for cls in range(num_classes):
+                true_positive = ((preds == cls) & (y == cls)).sum().float()
+                false_positive = ((preds == cls) & (y != cls)).sum().float()
+                false_negative = ((preds != cls) & (y == cls)).sum().float()
+                true_negative = ((preds != cls) & (y != cls)).sum().float()
+
+                metrics["dice_coefficient"][cls] += (2 * true_positive) / (2 * true_positive + false_positive + false_negative + 1e-8)
+                metrics["IoU"][cls] += true_positive / (true_positive + false_positive + false_negative + 1e-8)
+                metrics["accuracy"][cls] += (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative + 1e-8)
+                metrics["precision"][cls] += true_positive / (true_positive + false_positive + 1e-8)
+                metrics["recall"][cls] += true_positive / (true_positive + false_negative + 1e-8)
+                metrics["f1_score"][cls] += 2 * (metrics["precision"][cls] * metrics["recall"][cls]) / (metrics["precision"][cls] + metrics["recall"][cls] + 1e-8)
+                class_counts[cls] += 1
+
+    for key in metrics:
+        metrics[key] /= class_counts
+
+    if prin: # If print metrics:
+        print(f"Classes:     {[cls for cls in range(num_classes)]}")
+        print(f"Acc:         {[f'{acc:.4f}' for acc in metrics['accuracy']]}")
+        print(f"Dice Coeff:  {[f'{dice:.4f}' for dice in metrics['dice_coefficient']]}")
+
+    dict_metrics= {key: metrics[key].tolist() for key in metrics}
+    model1.train()
+    model2.train()
+    return dict_metrics
+
+def calculate_double_metrics(test_image_dir, test_mask_dir, model1, model2, num_classes=4, device=torch.device("cuda" if torch.cuda.is_available() else "cpu"), image_height=240, image_width=240, num_workers=0, batch_size=4, pin_memory=True):
+    """Hace lo mismo que check metrics, pero en este se usa el test_loader para el cálculo de las métricas del test."""
+    model1.eval()
+    model2.eval()
+
+    loader = get_test_loader(test_image_dir, test_mask_dir, batch_size= batch_size,  image_height=image_height, image_width=image_width, num_workers=num_workers, pin_memory=pin_memory)   # Cargar los datos.
+
+    dict_metrics = check_double_metrics(loader, model1, model2, num_classes=num_classes, prin=False, device=device)  # Calcular las métricas.
+    model1.train() # regresarlo a su estado original si se quiere seguir entrenando el modelo.
+    model2.train()
+
+    return dict_metrics
+
 def calculate_metrics(test_image_dir, test_mask_dir, model, num_classes=4, device=torch.device("cuda" if torch.cuda.is_available() else "cpu"), image_height=240, image_width=240, num_workers=0, batch_size=4, pin_memory=True):
     """Hace lo mismo que check metrics, pero en este se usa el test_loader para el cálculo de las métricas del test."""
     model.eval()
