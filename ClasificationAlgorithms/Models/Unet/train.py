@@ -127,6 +127,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     scaler = torch.amp.GradScaler('cuda')
     L_dicts_metrics = []  # Lista de diccionarios de métricas de cada época
     L_loss = []  # Lista de pérdidas
+    L_mean_dices = []
     best_dice = 0.0
     best_loss = 0.0
     cnt_patience = 0
@@ -142,9 +143,10 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 
         # Check accuracy on validation set:
         dict_metrics_per_class = check_metrics(val_loader, model, device=DEVICE)
-        epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])  # Coeficiente dice promedio de todas las clases en la época correspondiente
+        epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])  # Coeficiente dice promedio de todas las clases en la época actual
         L_dicts_metrics.append(dict_metrics_per_class)
         print(f"mean dice: {epoch_mean_dice}")
+        L_mean_dices.append(epoch_mean_dice)
 
         if SAVE_MODEL:
             if epoch == 1:
@@ -191,8 +193,8 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         df_metrics.to_csv('output_assets_model/metrics_per_epoch.csv', index=False)
         
         # Plot Dice (for class 0 only, it can be any class but just one at time) and Loss:
-        L_dice_0 = df_metrics[df_metrics.Class == 0]['dice_coefficient'].tolist()
-        plot_dice_loss(L_dice_0, L_loss, show_plot=False)
+        # L_dice_0 = df_metrics[df_metrics.Class == 0]['dice_coefficient'].tolist()  # Este es para graficar el dice de una sola clase, en este caso está la clase 0 (el background)
+        plot_dice_loss(L_mean_dices, L_loss, show_plot=False)
 
         # Save best val metrics during training in a csv file:
         cols = ['Best Dice Score', 'Best IoU', 'Best Accuracy', 'Best Precision', 'Best Recall', 'Best F1 Score']
