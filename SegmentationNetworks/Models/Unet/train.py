@@ -23,7 +23,7 @@ NUM_WORKERS = 0
 IMAGE_HEIGHT = 240
 IMAGE_WIDTH = 240
 PIN_MEMORY = True
-LOAD_MODEL = True    # True if you want to load a pre-trained model
+LOAD_MODEL = False    # True if you want to load a pre-trained model
 SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 
