@@ -158,6 +158,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 print(f"Model saved with loss: {epoch_loss} and mean dice: {epoch_mean_dice}")
                 best_loss = epoch_loss
                 best_dice = epoch_mean_dice
+                best_dice = epoch_mean_dice
                 best_model_epoch = epoch
                 cnt_patience = 0
 
