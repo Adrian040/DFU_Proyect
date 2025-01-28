@@ -15,10 +15,10 @@ from utils import save_predictions_as_imgs, load_checkpoint, get_loaders, plot_d
 # ------------------- Parámetros de entrenamiento --------------------
 
 NUM_EPOCHS = 10
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Device: ",DEVICE, "is available \n ----------------------")
-BATCH_SIZE = 4
+BATCH_SIZE = 8
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 240
 IMAGE_WIDTH = 240
