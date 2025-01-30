@@ -1,4 +1,5 @@
 import json
+import os
 import pandas as pd
 import zipfile
 import torch
@@ -112,6 +113,8 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         NUM_WORKERS,
         PIN_MEMORY
     )
+
+    os.makedirs("output_assets_model", exist_ok=True)   # Asegurarse de que la carpeta output_assets_model en donde guardamos métricas y demás cosas, exista.
 
     if LOAD_MODEL:
         try:
