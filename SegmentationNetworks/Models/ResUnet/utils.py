@@ -105,8 +105,8 @@ def plot_dice_loss(L_dice_result, L_loss_result, show_plot=False):
     plt.title('Curvas de Dice Score y Loss Function')
 
     # Guardado de la gráfica:
-    plt.savefig("output_assets_model/dice_loss_graph.png")
-    print(f"Gráfica de Loss y Dice guardada en: output_assets_model/dice_loss_graph.png")
+    plt.savefig("output_assets_model/dice_loss_graph_ResUnet.png")
+    print(f"Gráfica de Loss y Dice guardada en: output_assets_model/dice_loss_graph_ResUnet.png")
     # Mostrar la gráfica (opcional):
     if show_plot:
         plt.grid(True)

@@ -162,10 +162,10 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 # torch.save(checkpoint, f"model_checkpoint_epoch_{epoch+1}.pth")
 
                 # Guardar el modelo en .pth y en .zip:
-                torch.save(checkpoint, "output_assets_model/best_model_checkpoint.pth")
+                torch.save(checkpoint, "output_assets_model/best_model_checkpoint_ResUnet.pth")
                 # torch.save(checkpoint, "my_checkpoint.pth.tar")
-                with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
-                    zipf.write("output_assets_model/best_model_checkpoint.pth")
+                with zipfile.ZipFile("output_assets_model/best_model_checkpoint_ResUnet.zip", 'w') as zipf:
+                    zipf.write("output_assets_model/best_model_checkpoint_ResUnet.pth")
             else:
                 cnt_patience += 1
         # Early stopping:
@@ -183,20 +183,20 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
             # Crear un DataFrame con las listas y las épocas
         data = {'Epoch': range(1, len(L_dice) + 1), 'Loss': L_loss, 'Dice Score': L_dice, 'IoU': L_IoU, 'Accuracy': L_accuracy, 'Precision': L_precision, 'Recall': L_recall, 'F1 Score': L_f1_score}
         df = pd.DataFrame(data)
-        df.to_csv('output_assets_model/metrics.csv', index=False)     # Guardar el DataFrame en un archivo CSV
+        df.to_csv('output_assets_model/metrics_ResUnet.csv', index=False)     # Guardar el DataFrame en un archivo CSV
 
         # Plot Dice and Loss:
         plot_dice_loss(L_dice, L_loss, show_plot=False)
 
         # Save best val metrics during training in a csv file:
         best_metrics = {'Best Dice Score': max(L_dice), 'Best IoU': max(L_IoU), 'Best Accuracy': max(L_accuracy), 'Best Precision': max(L_precision), 'Best Recall': max(L_recall), 'Best F1 Score': max(L_f1_score)}
-        pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training).csv', index=False)
+        pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training)_ResUnet.csv', index=False)
 
         # Save parameters:
-        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[s]': round((end_time - start_time)/60, 4), 'Dropout Probability': DROPOUT_P, 'Patience (dropout)': PATIENCE}
-        pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters.csv', index=False)    # Guardar los parámetros en un archivo CSV
+        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4), 'Dropout Probability': DROPOUT_P, 'Patience (dropout)': PATIENCE}
+        pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters_ResUnet.csv', index=False)    # Guardar los parámetros en un archivo CSV
             # Guardar los parámetros como un archivo .json:
-        with open('output_assets_model/parameters.json', 'w') as json_file:
+        with open('output_assets_model/parameters_ResUnet.json', 'w') as json_file:
             json.dump(parameters, json_file, indent=4)
 
         print("Metrics saved successfully!")

@@ -13,4 +13,5 @@ ClasificationAlgorithms/Pruebas_API_Implementation
 SegmentationNetworks/data_DFU_images/Images_Gerardo/new_masks_68
 SegmentationNetworks/data_DFU_images/Images_Gerardo/new_maks_4classes_68
 SegmentationNetworks/Models/ResUnet/__pycache__
+SegmentationNetworks/Models/ResUnet/output_assets_model
 .codegpt

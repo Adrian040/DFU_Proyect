@@ -1,7 +1,7 @@
 import json
 import torch
 import pandas as pd
-from main import UNET, ResUnet
+from main import ResUnet
 from metrics import calculate_metrics, calculate_double_metrics
 
 # ------------- Parámetros ----------------
@@ -13,13 +13,13 @@ test_image_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data
 test_mask_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/Images_Gerardo/masks_68"
 
 # ----- Cargamos el modelo entrenado con las mejores métricas ----------
-checkpoint1 = torch.load("output_assets_model/best_model_checkpoint.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
-model1 = UNET(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
+checkpoint1 = torch.load("output_assets_model/best_model_checkpoint_ResUnet.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
+model1 = ResUnet(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model1.load_state_dict(checkpoint1["state_dict"])
 model1.eval()
 
-checkpoint2 = torch.load("output_assets_model/best_model_checkpoint.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
-model2 = UNET(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
+checkpoint2 = torch.load("output_assets_model/best_model_checkpoint_ResUnet.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
+model2 = ResUnet(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model2.load_state_dict(checkpoint2["state_dict"])
 model2.eval()
 
@@ -38,7 +38,7 @@ test_metrics = {
     "Recall": recall,
     "F1 Score": f1_score
 }
-pd.DataFrame(test_metrics, index=[0]).to_csv("output_assets_model/test_metrics.csv", index=False)
+pd.DataFrame(test_metrics, index=[0]).to_csv("output_assets_model/test_metrics_ResUnet.csv", index=False)
 # with open("output_assets_model/test_metrics.json", "w") as outfile: # Guardar las métricas en un archivo JSON
 #     json.dump(test_metrics, outfile)
 
