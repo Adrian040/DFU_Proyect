@@ -18,7 +18,7 @@ NUM_EPOCHS = 10
 LEARNING_RATE = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Device: ",DEVICE, "is available \n ----------------------")
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 240
 IMAGE_WIDTH = 240
@@ -26,8 +26,8 @@ PIN_MEMORY = True
 LOAD_MODEL = False    # True if you want to load a pre-trained model
 SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
-DROPOUT_P = 0.0  # Dropout probability (0.0 to not implement dropout)
-
+DROPOUT_P = 0.30  # Dropout probability (0.0 to not implement dropout)
+PATIENCE = 50  # for Early stopping (set big to avoid it)
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_masks"
 VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"
@@ -126,6 +126,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     L_recall = []
     L_f1_score = []
     best_dice_score = 0.0
+    cnt_patience = 0
 
     start_time = time.time()
     for epoch in range(NUM_EPOCHS):
@@ -147,6 +148,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
             # Save best model, based in dice score:
             if dc > best_dice_score:
                 best_dice_score = dc
+                cnt_patience = 0
                 checkpoint = {
                     "state_dict": model.state_dict(),
                     "optimizer": optimizer.state_dict(),
@@ -158,10 +160,15 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 # torch.save(checkpoint, "my_checkpoint.pth.tar")
                 with zipfile.ZipFile("output_assets_model/best_model_checkpoint.zip", 'w') as zipf:
                     zipf.write("output_assets_model/best_model_checkpoint.pth")
-
-            # Save some example predictions to a folder
-            if SAVE_IMS:
-                save_predictions_as_imgs( val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
+            else:
+                cnt_patience += 1
+        # Early stopping:
+        if cnt_patience >= PATIENCE:
+            print(f"===Early stopping at epoch: {epoch:04d}===")
+            break
+        # Save some example predictions to a folder
+        if SAVE_IMS:
+            save_predictions_as_imgs( val_loader, model, folder="output_assets_model/saved_images/", device=DEVICE)
         end_time = time.time()
 
     if SAVE_MODEL:
@@ -180,7 +187,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training).csv', index=False)
 
         # Save parameters:
-        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[s]': round((end_time - start_time)/60, 4), 'Dropout Probability': DROPOUT_P}
+        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[s]': round((end_time - start_time)/60, 4), 'Dropout Probability': DROPOUT_P, 'Patience (dropout)': PATIENCE}
         pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters.csv', index=False)    # Guardar los parámetros en un archivo CSV
             # Guardar los parámetros como un archivo .json:
         with open('output_assets_model/parameters.json', 'w') as json_file:
