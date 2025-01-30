@@ -14,8 +14,8 @@ images_dir = os.path.join(data_dir, 'images')
 masks_dir = os.path.join(data_dir, 'masks')
 
 # Definir los porcentajes de división de los datos (el test es del tamaño sobrante).
-train_size_perc = 0.80
-val_size_perc = 0.10
+train_size_perc = 0.85
+val_size_perc = 0.15
 
 def div_data(data_dir=data_dir, images_dir=images_dir, masks_dir=masks_dir, train_size_perc=train_size_perc, val_size_perc=val_size_perc):
     # Crear nuevas carpetas para las divisiones
@@ -27,7 +27,12 @@ def div_data(data_dir=data_dir, images_dir=images_dir, masks_dir=masks_dir, trai
     test_images_dir = os.path.join(data_dir, 'test_images')
     test_masks_dir = os.path.join(data_dir, 'test_masks')
 
-    # Crear directorios si no existen
+    # Borrar directorios si existen
+    for dir_path in [train_images_dir, train_masks_dir, val_images_dir, val_masks_dir, test_images_dir, test_masks_dir]:
+        if os.path.exists(dir_path):
+            shutil.rmtree(dir_path)
+
+    # Crear directorios
     os.makedirs(train_images_dir, exist_ok=True)
     os.makedirs(train_masks_dir, exist_ok=True)
     os.makedirs(val_images_dir, exist_ok=True)
@@ -81,5 +86,5 @@ def div_data(data_dir=data_dir, images_dir=images_dir, masks_dir=masks_dir, trai
     print("División de datos completada. Train_size: ", train_size, " . Val_size: ", val_size, " . Test_size: ", test_size )
     print("Porcentajes: ",int(train_size_perc*100),'-',int(val_size_perc*100),'-',int(round(test_size_perc*100)))
 
-
-div_data()
+if __name__ == '__main__': # Solo se ejecuta este script (no se llama como un módulo), se ejecuta la función div_data().
+    div_data()
