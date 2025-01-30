@@ -26,6 +26,7 @@ PIN_MEMORY = True
 LOAD_MODEL = False    # True if you want to load a pre-trained model
 SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
+DROPOUT_P = 0.0  # Dropout probability (0.0 to not implement dropout)
 
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_masks"
@@ -94,7 +95,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         ],
     )
 
-    model = UNET(in_channels=3, out_channels=1).to(DEVICE)
+    model = UNET(in_channels=3, out_channels=1, dropout_prob=DROPOUT_P).to(DEVICE)
     # loss_fn = nn.BCEWithLogitsLoss()
     loss_fn = dice_loss
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -113,7 +114,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     )
 
     if LOAD_MODEL:
-        load_checkpoint(torch.load("C:/Users/am969/Documents\DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint.pth",  weights_only=True), model)
+        load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint.pth",  weights_only=True), model)
         print("Model loaded successfully!")
 
     scaler = torch.amp.GradScaler('cuda')
@@ -179,7 +180,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training).csv', index=False)
 
         # Save parameters:
-        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[s]': round((end_time - start_time)/60, 4)}
+        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[s]': round((end_time - start_time)/60, 4), 'Dropout Probability': DROPOUT_P}
         pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters.csv', index=False)    # Guardar los parámetros en un archivo CSV
             # Guardar los parámetros como un archivo .json:
         with open('output_assets_model/parameters.json', 'w') as json_file:

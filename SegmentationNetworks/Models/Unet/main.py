@@ -8,16 +8,19 @@ import  torchvision.transforms.functional as TF
 
 # Bloque de código de cada capa de la Unet (donde se aplican las dos convoluciones, Además se aplica el btchnorm):
 class DoubleConv(nn.Module):
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels, out_channels, dropout_prob=0.0):
         super(DoubleConv, self).__init__()
-        self.conv = nn.Sequential(
+        layers = [
             nn.Conv2d(in_channels, out_channels, 3, 1, 1, bias = False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_channels, out_channels, 3, 1, 1, bias = False),
             nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True),
-        )
+            nn.ReLU(inplace=True)
+        ]
+        if dropout_prob > 0.0 and dropout_prob < 1.0:
+            layers.append(nn.Dropout(dropout_prob))
+        self.conv = nn.Sequential(*layers)
 
     def forward(self, x):
         return self.conv(x)
@@ -26,6 +29,7 @@ class DoubleConv(nn.Module):
 class UNET(nn.Module):
     def __init__(
         self, in_channels=3, out_channels=1, features=[64, 128, 256, 512],
+        dropout_prob=0.0
     ):
         super(UNET, self).__init__()
         self.downs = nn.ModuleList()
@@ -34,7 +38,7 @@ class UNET(nn.Module):
 
         # Down part of Unet:
         for feature in features:
-            self.downs.append(DoubleConv(in_channels, feature))
+            self.downs.append(DoubleConv(in_channels, feature, dropout_prob=dropout_prob))
             in_channels = feature
 
         # Up part of Unet:
@@ -44,10 +48,10 @@ class UNET(nn.Module):
                     feature*2, feature, kernel_size=2, stride=2,
                 )
             )
-            self.ups.append(DoubleConv(feature*2, feature))
+            self.ups.append(DoubleConv(feature*2, feature, dropout_prob=dropout_prob))
 
-        self.bottleneck = DoubleConv(features[-1], features[-1]*2) # Medium part
-        self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1) #Final part
+        self.bottleneck = DoubleConv(features[-1], features[-1]*2, dropout_prob=dropout_prob) # Medium part
+        self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1, dropout_prob=dropout_prob) #Final part
 
 
     def forward(self, x):
