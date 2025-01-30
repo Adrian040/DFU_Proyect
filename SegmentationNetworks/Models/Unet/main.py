@@ -51,7 +51,7 @@ class UNET(nn.Module):
             self.ups.append(DoubleConv(feature*2, feature, dropout_prob=dropout_prob))
 
         self.bottleneck = DoubleConv(features[-1], features[-1]*2, dropout_prob=dropout_prob) # Medium part
-        self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1, dropout_prob=dropout_prob) #Final part
+        self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size=1) #Final part
 
 
     def forward(self, x):
