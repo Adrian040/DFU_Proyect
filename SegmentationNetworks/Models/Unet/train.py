@@ -114,8 +114,11 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     )
 
     if LOAD_MODEL:
-        load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint.pth",  weights_only=True), model)
-        print("Model loaded successfully!")
+        try:
+            load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint.pth",  weights_only=True), model)
+            print("Model loaded successfully!")
+        except:
+            print("Model not found. Training from scratch...")
 
     scaler = torch.amp.GradScaler('cuda')
     L_dice = []
