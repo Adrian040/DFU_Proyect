@@ -161,7 +161,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 best_dice = epoch_mean_dice
                 best_dice = epoch_mean_dice
                 best_model_epoch = epoch
-                cnt_patience = 0
+                cnt_patience = 0  # Resetear el contador de paciencia si el modelo sí mejora.
 
                 checkpoint = {
                     "state_dict": model.state_dict(),
@@ -175,7 +175,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 with zipfile.ZipFile("output_assets_model/best_model_checkpoint2.zip", 'w') as zipf:
                     zipf.write("output_assets_model/best_model_checkpoint2.pth")
             else:
-                cnt_patience += 1 # Resetear el contador de paciencia si el modelo no mejora.
+                cnt_patience += 1 # Aumentar el contador si el modelo mejora.
         # Early stopping
         if EARLY_STOP and cnt_patience >= PATIENCE:
             print(f"===Early stopping at epoch: {epoch:04d}===")
