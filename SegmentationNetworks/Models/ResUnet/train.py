@@ -30,10 +30,10 @@ SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 DROPOUT_P = 0.30  # Dropout probability (0.0 to not implement dropout)
 PATIENCE = 50  # for Early stopping (set big to avoid it)
-TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_images"
-TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_masks"
-VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"
-VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_masks"
+TRAIN_IMG_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_images"
+TRAIN_MASK_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_masks"
+VAL_IMG_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"
+VAL_MASK_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_masks"
 
 
 #------------------- Funciones de entrenamiento -------------------
@@ -119,7 +119,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
 
     if LOAD_MODEL:
         try:
-            load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint_ResUnet.pth",  weights_only=True), model)
+            load_checkpoint(torch.load("/content/DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint_ResUnet.pth",  weights_only=True), model)
             print("Model loaded successfully!")
         except:
             print("Model not found. Training from scratch...")
