@@ -47,8 +47,8 @@ print("Métricas calculadas para el test set:")
 print(pd.DataFrame(test_metrics, index=[0]))
 
 # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
-VAL_IMG_DIR = "/content/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_images"
-VAL_MASK_DIR = "/content/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_masks"
+VAL_IMG_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"
+VAL_MASK_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_masks"
 print('========\n', 'Comparación de métricas de validación (después del entrenamiento, con el mejor estado del modelo)\n', '=====================')
 dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_double_metrics(VAL_IMG_DIR, VAL_MASK_DIR, model1, model2, device=DEVICE, batch_size=4)
 print(f"Dice Coefficient: {dice_coefficient:.4f}")
