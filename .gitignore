@@ -16,4 +16,7 @@ SegmentationNetworks/Models/ResUnet/__pycache__
 SegmentationNetworks/Models/ResUnet/output_assets_model
 **/__pycache__/
 **/output_assets_model/
+SegmentationNetworks/data_DFU_images/Images_Gerardo/pred_masks_68_attunet
+SegmentationNetworks/data_DFU_images/Images_Gerardo/pred_masks_68_resunet
+SegmentationNetworks/data_DFU_images/Images_Gerardo/pred_masks_68_resunet125e
 .codegpt
