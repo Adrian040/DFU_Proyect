@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import zipfile
 import torch
+import datetime
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
@@ -193,7 +194,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         pd.DataFrame(best_metrics, index=[0]).to_csv('output_assets_model/best_metrics_val(during_training)_ResUnet.csv', index=False)
 
         # Save parameters:
-        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4), 'Dropout Probability': DROPOUT_P, 'Patience (dropout)': PATIENCE}
+        parameters = {'Num Epochs': NUM_EPOCHS, 'Learning Rate': LEARNING_RATE, 'Batch Size': BATCH_SIZE, 'Image Height': IMAGE_HEIGHT, 'Image Width': IMAGE_WIDTH, 'Device': str(DEVICE), 'Num Workers': NUM_WORKERS, 'Pin Memory': PIN_MEMORY, 'Load Model': LOAD_MODEL, 'Save Images': SAVE_IMS, 'Train Image Dir': TRAIN_IMG_DIR, 'Val Image Dir': VAL_IMG_DIR, 'Elapsed Time[m]': round((end_time - start_time)/60, 4), 'Dropout Probability': DROPOUT_P, 'Patience (early_stop)': PATIENCE, 'Optimizer': 'Adam', 'Scheduler': 'ReduceLROnPlateau', 'Loss Function': 'Dice Loss', 'Scaler': 'GradScaler', 'Execution date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'Model': 'ResUnet'}
         pd.DataFrame(parameters, index=[0]).to_csv('output_assets_model/parameters_ResUnet.csv', index=False)    # Guardar los parámetros en un archivo CSV
             # Guardar los parámetros como un archivo .json:
         with open('output_assets_model/parameters_ResUnet.json', 'w') as json_file:
