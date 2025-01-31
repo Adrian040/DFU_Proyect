@@ -60,9 +60,9 @@ class ResUnet(nn.Module):
         self.c12 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
         self.c13 = nn.Conv2d(in_channels, 64, kernel_size=1, padding=0)
 
-        self.r2 = residual_block(64, 128, stride=2, dropout=dropout)
-        self.r3 = residual_block(128, 256, stride=2, dropout=dropout)
-        self.r4 = residual_block(256, 512, stride=2, dropout=dropout)
+        self.r2 = residual_block(64, 128, stride=2, dropout=0.0)                 ##
+        self.r3 = residual_block(128, 256, stride=2, dropout=0.0)                 ## Dropout desactivado para el encoder.
+        self.r4 = residual_block(256, 512, stride=2, dropout=0.0)                ##
 
         self.d1 = decoder_block(512, 256, dropout=dropout)
         self.d2 = decoder_block(256, 128, dropout=dropout)
