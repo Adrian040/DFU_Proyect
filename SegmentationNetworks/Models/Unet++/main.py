@@ -38,22 +38,22 @@ class UnetPlusPlus(nn.Module):
         self.enc5 = conv_block(512, 1024, dropout)  # Centro (X_{4,0})
 
         # Intermedios (X_{i,j})
-        self.x01 = conv_block(64 + 128, 64, dropout)
-        self.x11 = conv_block(128 + 256, 128, dropout)
-        self.x21 = conv_block(256 + 512, 256, dropout)
-        self.x31 = conv_block(512 + 1024, 512, dropout)
+        self.x01 = conv_block(64 + 64, 64, dropout)  # Ajustado para 64 + 64
+        self.x11 = conv_block(128 + 128, 128, dropout)
+        self.x21 = conv_block(256 + 256, 256, dropout)
+        self.x31 = conv_block(512 + 512, 512, dropout)
 
-        self.x02 = conv_block(64 * 2 + 128, 64, dropout)
-        self.x12 = conv_block(128 * 2 + 256, 128, dropout)
-        self.x22 = conv_block(256 * 2 + 512, 256, dropout)
+        self.x02 = conv_block(64 * 2 + 64, 64, dropout)
+        self.x12 = conv_block(128 * 2 + 128, 128, dropout)
+        self.x22 = conv_block(256 * 2 + 256, 256, dropout)
 
-        self.x03 = conv_block(64 * 3 + 128, 64, dropout)
-        self.x13 = conv_block(128 * 3 + 256, 128, dropout)
+        self.x03 = conv_block(64 * 3 + 64, 64, dropout)
+        self.x13 = conv_block(128 * 3 + 128, 128, dropout)
 
-        self.x04 = conv_block(64 * 4 + 128, 64, dropout)
+        self.x04 = conv_block(64 * 4 + 64, 64, dropout)
 
         # Upsampling layers
-        self.up1 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
+        self.up1 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)  # Ajustado para 128 -> 64
         self.up2 = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
         self.up3 = nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2)
         self.up4 = nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2)
@@ -93,6 +93,7 @@ def test():
     model = UnetPlusPlus(in_channels=1, out_channels=1, dropout=0.5)
     preds = model(x)
     print(preds.shape)
-    assert preds.shape == x.shape  # Esto fallaría si no se restaura la resolución espacial
+    assert preds.shape == x.shape  # Esto fallará si no se restaura la resolución espacial
+
 
 test()
