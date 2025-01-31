@@ -9,7 +9,7 @@ from albumentations.pytorch import ToTensorV2
 from tqdm import tqdm
 import time
 import torch.optim as optim
-from main import UNET, ResUnet
+from main import UNET
 from metrics import check_metrics, dice_loss, calculate_metrics
 from utils import save_predictions_as_imgs, load_checkpoint, get_loaders, plot_dice_loss
 

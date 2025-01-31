@@ -1,7 +1,7 @@
 import json
 import torch
 import pandas as pd
-from main import UNET, ResUnet
+from main import UNET
 from metrics import calculate_metrics, calculate_double_metrics
 
 # ------------- Parámetros ----------------
