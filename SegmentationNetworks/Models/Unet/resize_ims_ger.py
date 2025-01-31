@@ -13,6 +13,6 @@ def resize_images(input_folder, output_folder, width, height):
             img_resized.save(os.path.join(output_folder, filename))
 
 # Example usage:
-inp_folder = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/Images_Gerardo/raw_images_68"
-out_folder = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/Images_Gerardo/raw_images_68_resized"
+inp_folder = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/Images_Gerardo/masks_68"
+out_folder = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/Images_Gerardo/masks_68_resized"
 resize_images(inp_folder, out_folder, 240, 240)
