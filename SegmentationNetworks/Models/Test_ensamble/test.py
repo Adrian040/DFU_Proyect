@@ -15,12 +15,12 @@ test_image_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data
 test_mask_dir = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/Images_Gerardo/masks_68"
 
 # ----- Cargamos el modelo entrenado con las mejores métricas ----------
-checkpoint1 = torch.load("output_assets_model/best_model_checkpoint_ResUnet_125e.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
+checkpoint1 = torch.load("output_assets_model/best_model_checkpoint_ResUnetArtColab.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
 model1 = ResUnet(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model1.load_state_dict(checkpoint1["state_dict"])
 model1.eval()
 
-checkpoint2 = torch.load("output_assets_model/best_model_checkpoint_UnetPlusPlus.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
+checkpoint2 = torch.load("output_assets_model/best_model_checkpoint_UnetPlusPlusArtColab.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
 model2 = UnetPlusPlus(in_channels=3, out_channels=1).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model2.load_state_dict(checkpoint2["state_dict"])
 model2.eval()
@@ -51,8 +51,8 @@ print(pd.DataFrame(test_metrics, index=[0]))
 # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
 # VAL_IMG_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"  # colab
 # VAL_MASK_DIR = "/content/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_masks"
-VAL_IMG_DIR = "C:/Users/am969/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"
-VAL_MASK_DIR = "C:/Users/am969/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_masks"
+VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"
+VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_masks"
 print('========\n', 'Comparación de métricas de validación (después del entrenamiento, con el mejor estado del modelo)\n', '=====================')
 dice_coefficient, IoU, accuracy, precision, recall, f1_score = calculate_double_metrics(VAL_IMG_DIR, VAL_MASK_DIR, model1, model2, device=DEVICE, batch_size=4)
 print(f"Dice Coefficient: {dice_coefficient:.4f}")

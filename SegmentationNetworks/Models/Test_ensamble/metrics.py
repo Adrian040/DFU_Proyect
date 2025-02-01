@@ -69,6 +69,8 @@ def check_double_metrics(loader, model1, model2, prin=True, device="cuda"):
     false_negative = 0
     model1.eval()
     model2.eval()
+    w_m1 = 0.5
+    w_m2 = 1-w_m1
 
     with torch.no_grad():
         for x, y in loader:
@@ -76,7 +78,7 @@ def check_double_metrics(loader, model1, model2, prin=True, device="cuda"):
             y = y.to(device).unsqueeze(1)
             preds1 = torch.sigmoid(model1(x))
             preds2 = torch.sigmoid(model2(x))
-            preds = (0.5*preds1 + 0.5*preds2)  # Promedio de las predicciones
+            preds = (w_m1*preds1 + w_m2*preds2)  # Promedio de las predicciones
             preds = (preds > 0.5).float()  # Binarización de las predicciones
             num_correct += (preds == y).sum()
             num_pixels += (torch.numel(preds))
