@@ -69,8 +69,8 @@ def check_double_metrics(loader, model1, model2, prin=True, device="cuda"):
     false_negative = 0
     model1.eval()
     model2.eval()
-    # w_m1 = 0.461   # Para resUnet_125e + unet
-    w_m1 = 0.5
+    w_m1 = 0.461   # Para resUnet_125e + unet
+    # w_m1 = 0.5
     w_m2 = 1-w_m1
     print((w_m1, w_m2))
 
