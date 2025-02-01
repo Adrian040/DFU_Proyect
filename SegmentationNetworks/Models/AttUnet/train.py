@@ -25,11 +25,11 @@ NUM_WORKERS = 0
 IMAGE_HEIGHT = 240
 IMAGE_WIDTH = 240
 PIN_MEMORY = True
-LOAD_MODEL = False    # True if you want to load a pre-trained model
+LOAD_MODEL = True    # True if you want to load a pre-trained model
 SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 DROPOUT_P = 0.15  # Dropout probability (0.0 to not implement dropout)
-PATIENCE = 15  # for Early stopping (set big to avoid it)
+PATIENCE = 10  # for Early stopping (set big to avoid it)
 TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_images"
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/train_masks"
 VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/data_DFU_images/data_MICCAI/val_images"
@@ -127,7 +127,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     #         print("Model not found. Training from scratch...")
     if LOAD_MODEL:
         try:
-            load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/Models/Unet/output_assets_model/best_model_checkpoint_AttentionUnet.pth",  weights_only=True), model)
+            load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/Models/AttUnet/output_assets_model/best_model_checkpoint_AttentionUnet.pth",  weights_only=True), model)
             print("Model loaded successfully!")
         except:
             print("Model not found. Training from scratch...")
