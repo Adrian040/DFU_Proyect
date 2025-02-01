@@ -21,7 +21,7 @@ model1 = UNET(in_channels=3, out_channels=4).to(DEVICE)    ## ------------ Aquí
 model1.load_state_dict(checkpoint1["state_dict"])
 model1.eval()
 
-checkpoint2 = torch.load("output_assets_model/best_model_checkpoint_Unet++.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
+checkpoint2 = torch.load("output_assets_model/best_model_checkpoint_Unet++2.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
 model2 = UnetPlusPlus(in_channels=3, out_channels=4).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model2.load_state_dict(checkpoint2["state_dict"])
 model2.eval()
