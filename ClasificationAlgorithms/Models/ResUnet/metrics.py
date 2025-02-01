@@ -65,8 +65,6 @@ def check_double_metrics(loader, model1, model2, num_classes=4, prin=True, devic
     
     model1.eval()
     model2.eval()
-    w_1 = 0.68
-    w_2 = 1 - w_1
 
     with torch.no_grad():
         for x, y in loader:
@@ -74,7 +72,7 @@ def check_double_metrics(loader, model1, model2, num_classes=4, prin=True, devic
             y = y.to(device)
             preds1 = model1(x)
             preds2 = model2(x)
-            preds_mean = w_1*preds1 + w_2*preds2
+            preds_mean = (preds1 + preds2) / 2
             preds = torch.softmax(preds_mean, dim=1)
             preds = torch.argmax(preds, dim=1)
 
