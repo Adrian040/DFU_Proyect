@@ -51,7 +51,7 @@ def check_metrics(loader, model, num_classes = 4, prin=True, device="cuda"):
     return dict_metrics
 
 
-def check_double_metrics(loader, model1, model2, num_classes = 4, prin=True, device="cuda"):
+def check_double_metrics(loader, model1, model2, num_classes=4, prin=True, device="cuda"):
     """Calcula las métricas de evaluación de un modelo de segmentación multiclase (opcional) en un conjunto de datos de validación."""
     metrics = {
         "dice_coefficient": torch.zeros(num_classes, device=device),
@@ -85,20 +85,22 @@ def check_double_metrics(loader, model1, model2, num_classes = 4, prin=True, dev
                 metrics["dice_coefficient"][cls] += (2 * true_positive) / (2 * true_positive + false_positive + false_negative + 1e-8)
                 metrics["IoU"][cls] += true_positive / (true_positive + false_positive + false_negative + 1e-8)
                 metrics["accuracy"][cls] += (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative + 1e-8)
-                metrics["precision"][cls] += true_positive / (true_positive + false_positive + 1e-8)
-                metrics["recall"][cls] += true_positive / (true_positive + false_negative + 1e-8)
-                metrics["f1_score"][cls] += 2 * (metrics["precision"][cls] * metrics["recall"][cls]) / (metrics["precision"][cls] + metrics["recall"][cls] + 1e-8)
+                precision = true_positive / (true_positive + false_positive + 1e-8)
+                recall = true_positive / (true_positive + false_negative + 1e-8)
+                metrics["precision"][cls] += precision
+                metrics["recall"][cls] += recall
+                metrics["f1_score"][cls] += 2 * (precision * recall) / (precision + recall + 1e-8)
                 class_counts[cls] += 1
 
     for key in metrics:
         metrics[key] /= class_counts
 
-    if prin: # If print metrics:
+    if prin:  # If print metrics:
         print(f"Classes:     {[cls for cls in range(num_classes)]}")
         print(f"Acc:         {[f'{acc:.4f}' for acc in metrics['accuracy']]}")
         print(f"Dice Coeff:  {[f'{dice:.4f}' for dice in metrics['dice_coefficient']]}")
 
-    dict_metrics= {key: metrics[key].tolist() for key in metrics}
+    dict_metrics = {key: metrics[key].tolist() for key in metrics}
     model1.train()
     model2.train()
     return dict_metrics
