@@ -170,5 +170,3 @@ def dice_loss_multiclass(pred, target, epsilon=1e-6):
     dice_loss = 1 - dice.mean()
 
     return dice_loss
-
-
