@@ -6,6 +6,7 @@ SegmentationNetworks/Models/Unet/other_versions/output_assets_model_otherv
 SegmentationNetworks/Models/Unet/__pycache__
 SegmentationNetworks/data_DFU_images/__pycache__
 ClasificationAlgorithms/data_TissueSegNet/data_padded/
+ClasificationAlgorithms/data_TissueSegNet/unlabel_data_padded/
 ClasificationAlgorithms/Models/Unet/output_assets_model/
 ClasificationAlgorithms/Models/Unet/__pycache__
 ClasificationAlgorithms/Pruebas_API_Implementation
