@@ -25,14 +25,16 @@ NUM_WORKERS = 0
 IMAGE_HEIGHT = 240
 IMAGE_WIDTH = 240
 PIN_MEMORY = True
-LOAD_MODEL = False    # True if you want to load a pre-trained model
+LOAD_MODEL = True    # True if you want to load a pre-trained model
 SAVE_IMS = True
 SAVE_MODEL = True  # ! IMPORTANTE: debe esta en True para guardar el modelo y sus datos.
 PATIENCE = 20 # for early stopping. Set big to avoid it.
-p_dropout = 0.20 # Set 0 to no implement dropout
+p_dropout = 0.15 # Set 0 to no implement dropout
 
-TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_images"
-TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_masks"
+# TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_images"
+# TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_masks"
+TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_semisup_padded/Resized/unlabel_data_padded"
+TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_semisup_padded/pseudo_masks"
 VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_images"
 VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_masks"
 
@@ -120,7 +122,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
     )
 
     if LOAD_MODEL:
-        load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/SegmentationNetworks/Models/ResUnet/output_assets_model/best_model_checkpoint_ResUnet.pth",  weights_only=True), model)
+        load_checkpoint(torch.load("C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/Models/ResUnet/output_assets_model/best_model_checkpoint_ResUnet.pth",  weights_only=True), model)
         print("Model loaded successfully!")
 
     scaler = torch.amp.GradScaler('cuda')
@@ -169,10 +171,10 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
                 # torch.save(checkpoint, f"model_checkpoint_epoch_{epoch+1}.pth")
 
                 # Guardar el modelo en .pth y en .zip:
-                torch.save(checkpoint, "output_assets_model/best_model_checkpoint_ResUnet.pth")
+                torch.save(checkpoint, "output_assets_model/best_model_checkpoint_ResUnet_semisup_ft.pth")
                 # torch.save(checkpoint, "my_checkpoint.pth.tar")
-                with zipfile.ZipFile("output_assets_model/best_model_checkpoint_ResUnet.zip", 'w') as zipf:
-                    zipf.write("output_assets_model/best_model_checkpoint_ResUnet.pth")
+                with zipfile.ZipFile("output_assets_model/best_model_checkpoint_ResUnet_semisup_ft.zip", 'w') as zipf:
+                    zipf.write("output_assets_model/best_model_checkpoint_ResUnet_semisup_ft.pth")
             else:
                 cnt_patience += 1 # Aumentar el contador si el modelo mejora.
         # Early stopping

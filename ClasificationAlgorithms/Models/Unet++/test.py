@@ -15,12 +15,12 @@ test_image_dir = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/d
 test_mask_dir = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/test_masks"
 
 # ----- Cargamos el modelo entrenado con las mejores métricas ----------
-checkpoint1 = torch.load("output_assets_model/best_model_checkpoint_Unet++.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
+checkpoint1 = torch.load("output_assets_model/best_model_checkpoint_Unet++_semisup_ft.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
 model1 = UnetPlusPlus(in_channels=3, out_channels=4).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model1.load_state_dict(checkpoint1["state_dict"])
 model1.eval()
 
-checkpoint2 = torch.load("output_assets_model/best_model_checkpoint_Unet++.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
+checkpoint2 = torch.load("output_assets_model/best_model_checkpoint_Unet++_semisup_ft.pth", weights_only=True)  ## Nota: el argumento weights_only=True es para evitar el warning que indica que de esta forma se carga con mayor seguridad el modelo. Sin embargo no se están cargando otros datos como el optimizador. En resumen, esto es solo para quitar el warning pues en principio no hay datos maliciosos en la forma en que se guarda el modelo localmente.
 model2 = UnetPlusPlus(in_channels=3, out_channels=4).to(DEVICE)    ## ------------ Aquí al cambiar de modelo -------------.
 model2.load_state_dict(checkpoint2["state_dict"])
 model2.eval()
@@ -33,7 +33,7 @@ dict_test_metrics = calculate_double_metrics(test_image_dir, test_mask_dir, mode
 # ----- Guardamos las métricas en un archivo .csv --------------
 df_test_metrics = pd.DataFrame(dict_test_metrics, index=[0,1,2,3])
 df_test_metrics.index.name = 'Class'
-df_test_metrics.to_csv("output_assets_model/test_double_metrics.csv", index=True) # Sin índices.
+df_test_metrics.to_csv("output_assets_model/test_metrics_Unet++.csv", index=True) # Sin índices.
 # # Guardar las métricas en un archivo JSON
 # with open("output_assets_model/test_metrics.json", "w") as outfile:
 #     json.dump(test_metrics, outfile)
