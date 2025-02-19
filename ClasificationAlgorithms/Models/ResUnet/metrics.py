@@ -99,6 +99,7 @@ def check_double_metrics(loader, model1, model2, num_classes=4, prin=True, devic
         print(f"Classes:     {[cls for cls in range(num_classes)]}")
         print(f"Acc:         {[f'{acc:.4f}' for acc in metrics['accuracy']]}")
         print(f"Dice Coeff:  {[f'{dice:.4f}' for dice in metrics['dice_coefficient']]}")
+        print(f"mean dice: {np.mean(metrics['dice_coefficient'].tolist())}")    ## To print the mean Dice.
 
     dict_metrics = {key: metrics[key].tolist() for key in metrics}
     model1.train()

@@ -98,9 +98,10 @@ def check_double_metrics(loader, model1, model2, num_classes=4, prin=True, devic
         metrics[key] /= class_counts
 
     if prin:  # If print metrics:
-        print(f"Classes:     {[cls for cls in range(num_classes)]}")
-        print(f"Acc:         {[f'{acc:.4f}' for acc in metrics['accuracy']]}")
-        print(f"Dice Coeff:  {[f'{dice:.4f}' for dice in metrics['dice_coefficient']]}")
+        # print(f"Classes:     {[cls for cls in range(num_classes)]}")
+        # print(f"Acc:         {[f'{acc:.4f}' for acc in metrics['accuracy']]}")
+        # print(f"Dice Coeff:  {[f'{dice:.4f}' for dice in metrics['dice_coefficient']]}")
+        print(f"mean dice: {np.mean(metrics['dice_coefficient'].tolist())}")    ## Only print the mean Dice.
 
     dict_metrics = {key: metrics[key].tolist() for key in metrics}
     model1.train()
@@ -114,7 +115,7 @@ def calculate_double_metrics(test_image_dir, test_mask_dir, model1, model2, num_
 
     loader = get_test_loader(test_image_dir, test_mask_dir, batch_size= batch_size,  image_height=image_height, image_width=image_width, num_workers=num_workers, pin_memory=pin_memory)   # Cargar los datos.
 
-    dict_metrics = check_double_metrics(loader, model1, model2, num_classes=num_classes, prin=False, device=device)  # Calcular las métricas.
+    dict_metrics = check_double_metrics(loader, model1, model2, num_classes=num_classes, prin=True, device=device)  # Calcular las métricas.
     model1.train() # regresarlo a su estado original si se quiere seguir entrenando el modelo.
     model2.train()
 

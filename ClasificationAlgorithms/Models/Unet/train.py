@@ -146,7 +146,7 @@ def main(NUM_EPOCHS=NUM_EPOCHS):
         dict_metrics_per_class = check_metrics(val_loader, model, device=DEVICE)
         epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])  # Coeficiente dice promedio de todas las clases en la época actual
         L_dicts_metrics.append(dict_metrics_per_class)
-        print(f"mean dice: {epoch_mean_dice}")
+        # print(f"mean dice: {epoch_mean_dice}")
         L_mean_dices.append(epoch_mean_dice)
 
         if SAVE_MODEL:
