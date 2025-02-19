@@ -37,10 +37,14 @@ df_test_metrics.to_csv("output_assets_model/test_double_metrics_ResUnet.csv", in
 # # Guardar las métricas en un archivo JSON
 # with open("output_assets_model/test_metrics.json", "w") as outfile:
 #     json.dump(test_metrics, outfile)
+df_test_mean_metrics = pd.DataFrame(dict_test_metrics).mean()
+df_test_mean_metrics.to_csv("output_assets_model/test_double_mean_metrics_ResUnet.csv", index=True) # Sin índices.
 
 # ----- Imprimimos las métricas (opcional) --------------
 print("Métricas calculadas para el test set:")
 print(pd.DataFrame(dict_test_metrics))
+print("---- Métricas promedio ----")
+print(df_test_mean_metrics)
 
 
 # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
@@ -49,3 +53,5 @@ VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/dat
 print('========\n', 'Métricas de validación (después del entrenamiento, con el mejor estado del modelo)\n', '=====================')
 dict_val_metrics = calculate_double_metrics(VAL_IMG_DIR, VAL_MASK_DIR, model1, model2, num_classes=4, device=DEVICE, image_height=img_size_for_test, image_width=img_size_for_test)
 print(pd.DataFrame(dict_val_metrics))
+print("---- Métricas promedio ----")
+print(pd.DataFrame(dict_val_metrics).mean())

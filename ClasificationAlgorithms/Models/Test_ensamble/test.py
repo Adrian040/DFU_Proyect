@@ -41,6 +41,10 @@ model2.eval()
 print("Calculating test metrics...")
 dict_test_metrics = calculate_double_metrics(test_image_dir, test_mask_dir, model1, model2, num_classes=4, device=DEVICE, image_height=img_size_for_test, image_width=img_size_for_test)
 
+# dict_metrics_per_class = check_metrics(val_loader, model, device=DEVICE)
+#         epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])  # Coeficiente dice promedio de todas las clases en la época actual
+#         L_dicts_metrics.append(dict_metrics_per_class)
+#         print(f"mean dice: {epoch_mean_dice}")
 # ----- Guardamos las métricas en un archivo .csv --------------
 df_test_metrics = pd.DataFrame(dict_test_metrics, index=[0,1,2,3])
 df_test_metrics.index.name = 'Class'
@@ -49,9 +53,14 @@ df_test_metrics.to_csv("output_assets_model/test_double_metrics_ResUnet+Unet++_s
 # with open("output_assets_model/test_metrics.json", "w") as outfile:
 #     json.dump(test_metrics, outfile)
 
+df_test_mean_metrics = pd.DataFrame(dict_test_metrics).mean()
+df_test_mean_metrics.to_csv("output_assets_model/test_double_mean_metrics_ResUnet+Unet++_semisup_ft.csv", index=True) # Sin índices.
+
 # ----- Imprimimos las métricas (opcional) --------------
 print("Métricas calculadas para el test set:")
 print(pd.DataFrame(dict_test_metrics))
+print("---- Métricas promedio ----")
+print(df_test_mean_metrics)
 
 
 # ------------------- Comparación del cálculo de métricas de validación (desp. del entrenamiento) -------------------
@@ -60,3 +69,5 @@ VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/dat
 print('========\n', 'Métricas de validación (después del entrenamiento, con el mejor estado del modelo)\n', '=====================')
 dict_val_metrics = calculate_double_metrics(VAL_IMG_DIR, VAL_MASK_DIR, model1, model2, num_classes=4, device=DEVICE, image_height=img_size_for_test, image_width=img_size_for_test)
 print(pd.DataFrame(dict_val_metrics))
+print("---- Métricas promedio ----")
+print(pd.DataFrame(dict_val_metrics).mean())
