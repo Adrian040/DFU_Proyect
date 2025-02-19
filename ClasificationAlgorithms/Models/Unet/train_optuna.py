@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+import os
 import zipfile
 import torch
 import albumentations as A
@@ -21,6 +22,9 @@ TRAIN_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/da
 TRAIN_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/train_masks"
 VAL_IMG_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_images"
 VAL_MASK_DIR = "C:/Users/am969/Documents/DFU_Proyect/ClasificationAlgorithms/data_TissueSegNet/data_padded/val_masks"
+
+epochs_per_trial = 12
+n_trials = 50
 
 #------------------- Funciones de entrenamiento -------------------
 
@@ -59,10 +63,11 @@ def objective(trial):
     optimizer_name = trial.suggest_categorical('optimizer', ['Adam', 'AdamW'])
     batch_size = trial.suggest_int('batch_size', 2, 8)
     dropout_prob = trial.suggest_uniform('dropout_prob', 0.0, 0.5)
+    weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-3) if optimizer_name == "AdamW" else None
 
     model = UNET(in_channels=3, out_channels=4, impl_dropout=True, prob_dropout=dropout_prob).to(DEVICE)
     loss_fn = dice_loss_multiclass
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate) if optimizer_name == 'Adam' else optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate) if optimizer_name == 'Adam' else optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
     train_transform = A.Compose([
         A.Resize(height=240, width=240),
@@ -94,7 +99,7 @@ def objective(trial):
     scaler = torch.amp.GradScaler('cuda')
     best_mean_dice = 0.0
 
-    for epoch in range(10):  # Fixed number of epochs for optimization
+    for epoch in range(2):  # Fixed number of epochs for optimization
         epoch_loss = train_fn(train_loader, model, optimizer, loss_fn, scaler)
         dict_metrics_per_class = check_metrics(val_loader, model, device=DEVICE)
         epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])
@@ -106,7 +111,7 @@ def objective(trial):
 
 def main():
     study = optuna.create_study(direction='maximize')
-    study.optimize(objective, n_trials=50)
+    study.optimize(objective, n_trials=5)
 
     print("Best trial:")
     trial = study.best_trial
@@ -114,6 +119,15 @@ def main():
     print("  Params: ")
     for key, value in trial.params.items():
         print("    {}: {}".format(key, value))
+
+    # Guardar los mejores hiperparámetros en un archivo JSON
+    best_params = {
+        "value": trial.value,
+        "params": trial.params
+    }
+    os.makedirs("output_assets_model", exist_ok=True)
+    with open("output_assets_model/optuna_best_hyp.json", "w") as f:
+        json.dump(best_params, f, indent=4)
 
 if __name__ == "__main__":
     main()
