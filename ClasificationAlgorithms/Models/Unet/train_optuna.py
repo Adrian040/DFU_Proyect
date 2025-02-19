@@ -99,7 +99,7 @@ def objective(trial):
     scaler = torch.amp.GradScaler('cuda')
     best_mean_dice = 0.0
 
-    for epoch in range(2):  # Fixed number of epochs for optimization
+    for epoch in range(epochs_per_trial):  # Fixed number of epochs for optimization
         epoch_loss = train_fn(train_loader, model, optimizer, loss_fn, scaler)
         dict_metrics_per_class = check_metrics(val_loader, model, device=DEVICE)
         epoch_mean_dice = np.mean(dict_metrics_per_class["dice_coefficient"])
@@ -111,7 +111,7 @@ def objective(trial):
 
 def main():
     study = optuna.create_study(direction='maximize')
-    study.optimize(objective, n_trials=5)
+    study.optimize(objective, n_trials=n_trials)
 
     print("Best trial:")
     trial = study.best_trial
@@ -122,7 +122,7 @@ def main():
 
     # Guardar los mejores hiperparámetros en un archivo JSON
     best_params = {
-        "value": trial.value,
+        "mean Dice value": trial.value,
         "params": trial.params
     }
     os.makedirs("output_assets_model", exist_ok=True)
